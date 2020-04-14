@@ -17,6 +17,6 @@ public class Custom {
     public static void main(String[] args) {
         Context context = new Context(new Mysql());//
         context.doConn();
-        Executors.newCachedThreadPool();
+       // Executors.newCachedThreadPool();
     }
 }
