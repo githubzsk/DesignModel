@@ -12,7 +12,7 @@
 
 首先我得说一下，用zk给dubbo做注册中心时，zk内部node节点的父子层级关系，
 
-![image-20200418141633802](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20200418141633802.png)
+![image-20200418141633802](https://img-blog.csdnimg.cn/20200420154523572.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MzAxMjkzNw==,size_16,color_FFFFFF,t_70#pic_center)
 
 会在根目录下创建dubbo节点，这个dubbo节点节点下又有好多节点，其中有一个metadata节点这个我们不关心，其余的都是类名节点，这个类名节点下又有4个节点，其中两个一个是consumers另一个是providers，也就是提供者和消费者，剩下的两个节点我们先不去关心，consumers里面的每个节点都代表这个服务的每个消费者信息，providers里面的每个节点都代表着每个消费者信息。
 
