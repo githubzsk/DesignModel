@@ -33,6 +33,8 @@
 
 ##### 4 zookeeper临时节点实现原理
 
+事实上zk有一个内置数据库叫做ZKDatabase，这个ZKDatabase里面封装了一个叫做DataTree，这个DataTree里面就封装了zk的所有节点包括临时节点，临时节点使用一个ConcurrentHashMap来储存，我们知道zk客户端连接zk服务端的时候会保持一个session，当断开连接的时候会调用一个叫做killSession的方法把你的sessionid传进去，直接从这个ConcurrentHashMap中remove掉，这样就实现了临时节点的功能。
+
 ##### 5 zookeeper角色
 
 1. ***Leader***：zk集群中的主节点，主要负责的是事务操作，换句话说就是主要负责写操作（增删改）
@@ -41,9 +43,25 @@
 
 ##### 6 CAP理论
 
-##### 7
+CAP原则又称CAP定理，指的是在一个分布式系统中，[一致性](https://baike.baidu.com/item/一致性/9840083)（Consistency）、[可用性](https://baike.baidu.com/item/可用性/109628)（Availability）、分区容错性（Partition tolerance）。CAP 原则指的是，这三个要素最多只能同时实现两点，不可能三者兼顾。
 
-##### 8
+##### 7 Leader选举
+
+1. 初始化选举
+
+   首先他会用到两个id，一个是myid，另一个是zxid（事务id，每次leader被选举出来都会在他原来的基础上+1）
+
+   每台机器都会先投自己一票，然后相互交换投票，然后投zxid最大的那个，当然刚开始的话zxid都一样，在zxid一样的情况下，会投myid较大的那个，所以有个结论，在初始化选举的时候，当集群中启动的数量超过一半的时候，这时谁的myid最大谁就是leader
+
+2. 重启动选举
+
+   
+
+##### 8 zookeeper集群为什么要搭建奇数台
+
+zookeeper集群有这样一个特性，只要过半机器正常，那zk集群就对外可用。
+
+三台和四台都是最多容忍一台挂掉，那么就没有必要用4台，当然你的读请求负载特别高的情况下至少要用4台，那么你可以选择将第四台设置成Observe，挂掉一个Observe再挂一个Follower，集群照样可以用，这样可以提高集群的容错性。
 
 ##### 9
 
