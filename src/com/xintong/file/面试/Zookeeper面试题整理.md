@@ -33,6 +33,8 @@
 
 ##### 4 zookeeper临时节点实现原理
 
+事实上zk有一个内置数据库叫做ZKDatabase，这个ZKDatabase里面封装了一个叫做DataTree，这个DataTree里面就封装了zk的所有节点包括临时节点，临时节点使用一个ConcurrentHashMap来储存，我们知道zk客户端连接zk服务端的时候会保持一个session，当断开连接的时候会调用一个叫做killSession的方法把你的sessionid传进去，直接从这个ConcurrentHashMap中remove掉，这样就实现了临时节点的功能。
+
 ##### 5 zookeeper角色
 
 1. ***Leader***：zk集群中的主节点，主要负责的是事务操作，换句话说就是主要负责写操作（增删改）
