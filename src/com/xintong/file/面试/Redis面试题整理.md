@@ -1,6 +1,17 @@
 # Redis面试题
 
-##### 1. *Redis和Mysql数据不一致解决
+##### 1. 为什么使用缓存？使用缓存会带来什么问题？
+
+使用缓存的目的 
+
+-  高性能 
+- 高并发
+
+带来的问题 
+
+-  缓存、数据库双写不一致
+- 穿透、击穿、雪崩
+- 并发竞争
 
 ##### 2. *Redis数据结构
 
@@ -160,4 +171,186 @@ Sentinel发送ping，Reds实例回复pong
 _优点_：占用内存小，查询速度快
 
 _缺点_：误判率的问题
+
+##### 14.Redis过期策略？内存淘汰机制？
+
+_过期策略_：定期删除+惰性删除
+
+- 定期删除：redis每隔几百毫秒就随机抽取设置过期时间的key检查，如果过期就会删除了
+- 惰性删除：定期删除引发的问题，在你get这个key之前他会发现这个key本该已经过期了，然后这个时候在去删除这个key并返回空。
+
+_内存淘汰机制_：
+
+- `noeviction`: 新写入操作会报错，不用
+- `allkey-lru`: 移除最近最少使用的 key 最常用
+- `allkeys-random`: 随机移除某个 key  不用
+- `volatile-lru`
+- `volatile-random`
+- `volatile-ttl`
+
+##### 15.数据库和缓存双写不一致
+
+_原因1_： 先修改数据库，在删除缓存，各种原因缓存删除失败，导致数据库为新，缓存为旧
+
+解决： 先删除缓存，在修改数据库
+
+原因2：并发或者高并发情况下，A线程更新数据库，B线程读取数据，A线程删除了缓存，B线程没读到缓存区读			  数据库，读完之后进行缓存，这个时候A线程修改了数据库，这个时候缓存和数据库又不一致了
+
+解决：
+
+我先说三种更新策略
+
+1. 先更新数据库，在更新缓存
+2. 先删除缓存，在更新数据库
+3. 先更新数据库，在删除缓存
+
+（1）对于_先更新数据库，再更细缓存_
+
+​		问题1： 更新数据库成功，更新缓存失败       数据不一致
+
+​		问题2： A线程更新数据库，B线程更新数据库，B线程更新缓存，A线程更新缓存  数据不一致
+
+​		问题3： 每次更新数据库都要更新缓存，对于读请求不多的场景，属于浪费性能
+
+ 	**所以这种方案不考虑**
+
+（2）对于先删除缓存，再更新数据
+
+​		问题: 两线程A写B读，A 删除缓存 B读缓存，B读数据库，B写缓存，A更新数据库  脏数据
+
+​		解决方案1：① 延时双删 ,写线程在更新完数据库之后 重开一个线程延时一定时间之后，再次删除缓存
+
+​		缺点： 在延时期间内，依旧能读到脏数据         不适用于要求强一致性的业务 
+
+```java
+public void write(String key,Object data){
+        redis.delKey(key);
+        db.updateData(data);
+        Thread.sleep(1000);
+        redis.delKey(key);
+    }
+```
+
+​		解决方案2： 对于同一数据路由到同一服务上，然后把对数据的写请求，以及对数据的缓存添加到内存队列中，后面来的请求去查看内存队列中有没有写请求，有的话说明写还没有处理完，后来的请求继续往队列里面放，如果没有写请求，那么就说明写请求已经处理完毕，不用进队列，直接读就可以
+
+​		有点:  能够保障数据强一致性
+
+​		缺点，高并发+写操作频繁的情况下，性能不是很好
+
+##### 16. Redis实现分布式锁
+
+redis实现的分布式锁是基于redis的setnx指令，setnx和set的区别就是setnx不会再设置已有的key
+
+可以使用jedis，也可以使用spring data redis 的RedisTemplate我们在项目里面更多使用RedisTemplate，那么我就用RedisTemplate来说吧，其实原理都是一样的
+
+```java
+public String getGoods(int goodsId){
+    //以唯一资源id为key
+    String lockKey = "goods_"+goodsId;
+   try{
+    //用redisTemplate的setIfAbsent API 去setnx数据，lockKey唯一，value随意，超时时间根据业务而定
+    // 超时是为了避免程序崩了锁永远无法释放   
+    Boolean isLock = redisTemplate.opsForValue().setIfAbsent(lockKey, "zsk", 10, 							 TimeUnit.SECONDS);
+       if (!isLock){
+           //如果没有获取到就通过循环等方式再去尝试获取，同时可以限定超时时间，超过多久就不在获取直接退出
+           return "failed";
+       }
+       //如果获取到了之后就执行业务逻辑
+       int count = Integer.parseInt(redisTemplate.opsForValue().get("count"));
+       if (count > 0){
+           count --;
+           System.out.println("扣除库存成功");
+       }else{
+           System.out.println("库存不足");
+       }
+   }finally {
+       //最后在finally中去删除这lockKey释放锁
+       redisTemplate.delete(lockKey);
+   }
+    return "success";
+}
+```
+
+这种锁并发并不高的情况下可以使用，但是高并发情况下肯定是不适用的，因为他有缺陷，第一个线程获取了锁，如果业务还没执行完，锁就失效了，第二个线程就可以拿到锁，然后第一个线程执行到finally去删除lockKey，这个时候删除的 是第二个线程的锁子，肯定是不行的，所有为了解决高并发下的这个问题，
+
+```java
+public String getGoods(int goodsId){
+    //以唯一资源id为key
+    String lockKey = "goods_"+goodsId;
+    //生成唯一value，防止别的线程误删当前线程的lockKey
+    String value = UUID.randomUUID().toString();
+    try{
+        //用redisTemplate的setIfAbsent API 去setnx数据，lockKey唯一，value随意，超时时间根据业务而定
+        // 超时是为了避免程序崩了锁永远无法释放   
+        Boolean isLock = redisTemplate.opsForValue().setIfAbsent(lockKey, value, 10,                      TimeUnit.SECONDS);
+        if (!isLock){
+            //如果没有获取到就通过循环等方式再去尝试获取，同时可以限定超时时间，超过多久就不在获取直接退出
+            return "failed";
+        }
+        //如果获取到了之后就执行业务逻辑，同时新开线程对超时时间进行续时
+        //新开线程续时，避免业务未执行完而lockKey失效
+        //处理业务
+        int count = Integer.parseInt(redisTemplate.opsForValue().get("count"));
+        if (count > 0){
+            count --;
+            System.out.println("扣除库存成功");
+        }else{
+            System.out.println("库存不足");
+        }
+    }finally {
+        //保证了只由当前线程删除当前lockKey
+        if(redisTemplate.opsForValue().get(lockKey).equals(value)){
+            //最后在finally中去删除这lockKey释放锁
+       		 redisTemplate.delete(lockKey);
+        }
+       
+    }
+    return "success";
+}
+```
+
+这样就可以在高并发环境下使用了，但是还有更简便的写法，使用redisson相关Api
+
+```java
+ public String getProduct2(int product_id){
+        String lockKey = "product"+product_id;
+        
+        // 第一步 创建锁
+        RLock lock = redisson.getLock(lockKey);
+        try{
+        	//第二步 加锁
+            lock.lock(10,TimeUnit.SECONDS);
+            //获取库存
+            int stock = Integer.parseInt(redisTemplate.opsForValue().get("stock"));
+            if (stock > 0){
+                //减少库存
+                stock--;
+                redisTemplate.opsForValue().set("stcok",stock+"");
+                System.out.println("扣件成功，库存剩余： + " + stock);
+            }else {
+                System.out.println("扣减失败,库存不足");
+            }
+        }finally {
+            //第三步 释放锁
+            lock.unlock();
+        }
+        return "success";
+    }
+```
+
+这种写法和上面我说的那种写法的底层原理是一模一样的，事实上就是redisson对原理做的封装
+
+这个就是redis做的分布式锁，但是他也有一点问题，主备模式下
+
+
+
+##### 17 Redis实现分布式事务
+
+
+
+
+
+
+
+Redis高可用集群问题
 
