@@ -364,3 +364,5 @@ public String getGoods(int goodsId){
 1. 消息队列：把并发的set操作放到消息队列中使其串行化。
 2. 分布式锁+时间戳
 
+##### 21. Redis主从原理
+
