@@ -21,7 +21,7 @@ public enum RedisArticle implements Article {
     ITEM17(17,"Redis过期策略？内存淘汰机制？"),
     ITEM18(18,"数据库和缓存双写不一致"),
     ITEM19(19,"Redis实现分布式锁"),
-    ITEM20(20," Redis实现分布式事务");
+    ITEM20(20,"Redis并发竞争问题");
     RedisArticle(int id,String name){
         this.id = id;
         this.name = name;

@@ -104,13 +104,7 @@ Sentinel发送ping，Reds实例回复pong
 1. _相互发现_：Sentinel跟Master之间通过发布订阅的形式去相互发现 "PUBLISH" "sentinel:hello"
 2. _相互传递信息_:
 
-##### 12. 哨兵之间Leader选举机制
-
-​		自己选一个哨兵中run id最小的
-
-​		自己再轮流看别人选的是谁
-
-##### 13 哨兵如何选一个Slave作为新的Master
+##### 12.哨兵如何选一个Slave作为新的Master
 
 1. 主观下线
 2. 客观下线
@@ -120,6 +114,23 @@ Sentinel发送ping，Reds实例回复pong
    - 优先级最高的
    - 选择复制偏移量更大的从作为主
    - 选择run id最小的作为主
+
+##### 13   Sentinel的Leader选举
+
+Sentinel集群正常运行期间，每个Sentinel实例事实上是平等的，等到需要对redis实例进行Master选举的时候，Sentinel实例会进行Leader选举
+
+哨兵的Leader选举机制使用的是Raft协议，类似于Zookeeper的ZAB协议，事实上都是Paxos算法的阉割版，简化版，它的大致流程是这样的。
+
+1. 首先检查自己是否给别的Sentinel投过票，如果投过，那么他变为Follower
+
+2. 如果没投过，那么他就变为Candidate，一旦成为Candidate那么他说做以下
+   - 自己的epoch+1，相当于任期加1
+   - 设置投票超时时间，1秒内的任意毫秒数
+   - 带上自己的epoch让别的Sentinel节点为自己投票
+   - 投自己一票
+3. 如果其他Sentinel给Candidate投了票，那么其他Sentinel在本轮中就是Follower
+4. Candidate会不断统计自己票数，在超时时间内，如果一旦自己的票数过半切超过quorum，那么这个Candidate就转变为Leader
+5. 如果一旦超时，那么便进行下一轮选举，直至选出Leader
 
 ##### 14. Redis有哪些架构模式及其特点？
 
@@ -150,9 +161,11 @@ Sentinel发送ping，Reds实例回复pong
 
 2. _缓存击穿_:  热点key突然到期或者其他原因，缓存中没有，数据库中有，并发用户有特别多，在缓存中没查到又同时去查数据库，导致数据库压力增
 
-   解决方案：1、特别高的并发下可以考虑分布式锁实现
+   解决方案：1、数百或者千的并发，直接使用互斥锁就OK，最好不要使用简单的Synchroized或者双						  重判断，效率有问题
 
-   ​					2、数百或者千的并发，直接使用互斥锁就OK，最好不要使用简单的Synchroized或者双重判断，						  效率有问题
+   ​					2、特别高的并发下可以考虑分布式锁实现
+
+   ​					3、使用对于热点key查询之前使用setnx指令，
 
 3. _缓存雪崩_：
 
@@ -342,15 +355,12 @@ public String getGoods(int goodsId){
 
 这个就是redis做的分布式锁，但是他也有一点问题，主备模式下
 
+##### 20. Redis并发竞争问题
 
+情景描述：并发对同一个key进行写操作，可能引发最终结果与期望不一致
 
-##### 20 Redis实现分布式事务
+解决方案：
 
-
-
-
-
-
-
-Redis高可用集群问题
+1. 消息队列：把并发的set操作放到消息队列中使其串行化。
+2. 分布式锁+时间戳
 
