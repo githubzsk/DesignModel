@@ -250,112 +250,7 @@ public void write(String key,Object data){
 
 ​		缺点，高并发+写操作频繁的情况下，性能不是很好
 
-##### 19. Redis实现分布式锁
-
-redis实现的分布式锁是基于redis的setnx指令，setnx和set的区别就是setnx不会再设置已有的key
-
-可以使用jedis，也可以使用spring data redis 的RedisTemplate我们在项目里面更多使用RedisTemplate，那么我就用RedisTemplate来说吧，其实原理都是一样的
-
-```java
-public String getGoods(int goodsId){
-    //以唯一资源id为key
-    String lockKey = "goods_"+goodsId;
-   try{
-    //用redisTemplate的setIfAbsent API 去setnx数据，lockKey唯一，value随意，超时时间根据业务而定
-    // 超时是为了避免程序崩了锁永远无法释放   
-    Boolean isLock = redisTemplate.opsForValue().setIfAbsent(lockKey, "zsk", 10, 							 TimeUnit.SECONDS);
-       if (!isLock){
-           //如果没有获取到就通过循环等方式再去尝试获取，同时可以限定超时时间，超过多久就不在获取直接退出
-           return "failed";
-       }
-       //如果获取到了之后就执行业务逻辑
-       int count = Integer.parseInt(redisTemplate.opsForValue().get("count"));
-       if (count > 0){
-           count --;
-           System.out.println("扣除库存成功");
-       }else{
-           System.out.println("库存不足");
-       }
-   }finally {
-       //最后在finally中去删除这lockKey释放锁
-       redisTemplate.delete(lockKey);
-   }
-    return "success";
-}
-```
-
-这种锁并发并不高的情况下可以使用，但是高并发情况下肯定是不适用的，因为他有缺陷，第一个线程获取了锁，如果业务还没执行完，锁就失效了，第二个线程就可以拿到锁，然后第一个线程执行到finally去删除lockKey，这个时候删除的 是第二个线程的锁子，肯定是不行的，所有为了解决高并发下的这个问题，
-
-```java
-public String getGoods(int goodsId){
-    //以唯一资源id为key
-    String lockKey = "goods_"+goodsId;
-    //生成唯一value，防止别的线程误删当前线程的lockKey
-    String value = UUID.randomUUID().toString();
-    try{
-        //用redisTemplate的setIfAbsent API 去setnx数据，lockKey唯一，value随意，超时时间根据业务而定
-        // 超时是为了避免程序崩了锁永远无法释放   
-        Boolean isLock = redisTemplate.opsForValue().setIfAbsent(lockKey, value, 10,                      TimeUnit.SECONDS);
-        if (!isLock){
-            //如果没有获取到就通过循环等方式再去尝试获取，同时可以限定超时时间，超过多久就不在获取直接退出
-            return "failed";
-        }
-        //如果获取到了之后就执行业务逻辑，同时新开线程对超时时间进行续时
-        //新开线程续时，避免业务未执行完而lockKey失效
-        //处理业务
-        int count = Integer.parseInt(redisTemplate.opsForValue().get("count"));
-        if (count > 0){
-            count --;
-            System.out.println("扣除库存成功");
-        }else{
-            System.out.println("库存不足");
-        }
-    }finally {
-        //保证了只由当前线程删除当前lockKey
-        if(redisTemplate.opsForValue().get(lockKey).equals(value)){
-            //最后在finally中去删除这lockKey释放锁
-       		 redisTemplate.delete(lockKey);
-        }
-       
-    }
-    return "success";
-}
-```
-
-这样就可以在高并发环境下使用了，但是还有更简便的写法，使用redisson相关Api
-
-```java
- public String getProduct2(int product_id){
-        String lockKey = "product"+product_id;
-        
-        // 第一步 创建锁
-        RLock lock = redisson.getLock(lockKey);
-        try{
-        	//第二步 加锁
-            lock.lock(10,TimeUnit.SECONDS);
-            //获取库存
-            int stock = Integer.parseInt(redisTemplate.opsForValue().get("stock"));
-            if (stock > 0){
-                //减少库存
-                stock--;
-                redisTemplate.opsForValue().set("stcok",stock+"");
-                System.out.println("扣件成功，库存剩余： + " + stock);
-            }else {
-                System.out.println("扣减失败,库存不足");
-            }
-        }finally {
-            //第三步 释放锁
-            lock.unlock();
-        }
-        return "success";
-    }
-```
-
-这种写法和上面我说的那种写法的底层原理是一模一样的，事实上就是redisson对原理做的封装
-
-这个就是redis做的分布式锁，但是他也有一点问题，主备模式下
-
-##### 20. Redis并发竞争问题
+##### 19. Redis并发竞争问题
 
 情景描述：并发对同一个key进行写操作，可能引发最终结果与期望不一致
 
@@ -364,5 +259,21 @@ public String getGoods(int goodsId){
 1. 消息队列：把并发的set操作放到消息队列中使其串行化。
 2. 分布式锁+时间戳
 
-##### 21. Redis主从原理
+##### 20. Redis主从原理
+
+_全量同步_
+
+1. 连接
+2. 测试心跳
+3. 数据同步
+
+- 首先建立Socket连接
+- 然后主从机ping-pong机制确认通讯正常，不正常则断开重连，正常便进行第三部数据同步
+- 从机启动，发送sync指令到主机，这个时候主机会有两个动作。①使用bgsave指令进行快照生成rdb文件，②同时在缓冲区记录这一刻之后的增量。接下来再把这个rdb文件传给从机，从机清空本身内存开始恢复rdb，待从机恢复完成之后，这个时候便开始进入增量同步模式，主机便会通过RESP协议把缓冲区的数据发送给从机，从机不断的接受主机的事务请求，实现最终一致性
+
+_增量同步_
+
+在redis2.8往前的版本之后sync指令，2.8+增加了psync指令是增量同步
+
+当slave断开重连的时候，slave本身是存有数据的，并不需要全量同步，所以会使用psync指令，psync有两个参数，一个是主机的run_id，另一个是从主机最后命令的偏移量offset，然后主机会根据你需要的偏移量给你发送你想要的的数据，实现数据同步
 
