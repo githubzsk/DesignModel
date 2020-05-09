@@ -53,7 +53,7 @@ handler：拒绝策略，拒绝策略一共有4中
 执行逻辑（源码），execute执行逻辑非常清晰
 
 ```java
-public void execute(Runnable command) {
+			public void execute(Runnable command) {
     //1. 首先任务为空的话，直接抛NPE
     if (command == null)
         throw new NullPointerException();
@@ -194,9 +194,63 @@ private Runnable getTask() {
 
 ##### 7. *Synchroized和lock的底层原理
 
-##### 8. *Synchroized锁方法、对象头、代码块的区别
+##### 8. *Synchroized锁方法、代码块的区别
+
+1. _锁方法_:
+
+   - 修饰普通方法：
+
+     ```java
+     public synchronized  void method2(){
+      //...
+     }
+     //是对当前对象加锁，这种写法相当于
+     synchronized(this){
+         //....
+     }
+     ```
+
+   - 修饰静态方法
+
+     ```java
+     public static synchronized void method1(){
+         //...
+     }
+     //是对该类对象加锁，这种写法相当于
+     synchronized(ClassName.class){
+         //....
+     }
+     ```
+
+先说**作用**、再说**使用**、再说**原理**
+
+**作用**：保证并发的 原子性 、可见性 、以及禁止指令重排序
+
+**使用**：synchronize不管是对于方法还是同步代码块，它锁的都是对象，可能是实例对象或者是类对象
+
+用来修饰普通方法锁定的是当前对象，相当于代码块括号中写（this） 
+
+用来修饰静态方法锁定的是类对象，相当于代码块括号中写（ClassName.class）
+
+**原理**
+
+使用javap -c命令对class文件反汇编后去看的时候，会发现同步代码块里的代码会处于monitorenter和monitorexit指令之间，每个对象都有一个Monitor对象与之关联，线程执行到monitorenter的时候会去尝试获得对象对于的Monitor，说的简单一点就是尝试获得对象的锁，当执行到monitorexit的时候就去释放对象对应的monitor也就是释放锁，这就是synchronize同步代码块的实现原理。
+
+那再稍微深入一下，说一下这个Monitor对象的实现原理，事实上这个Monitor对象的原型是一个叫做ObjectMonitor的类，我们一般看不到因为这个得编译JDK源码之后才能看得到，这个类由C++实现，这里面有几个关键的属性 owner 、count、EntryList、WaitSet、 当线程执行到monitorenter，该monitor对象的count+1  owner设置为当前线程，这个线程执行到了monitorexit，monitor对象的count-1 owner设为null，所有尝试进入同步代码块的线程都会进入EntryList中，所有调用了wait()方法的线程会进入WaitSet中，owner改为null，count-1，也就意味着该线程释放了当前monitor，这个也能顺便解释了调用wait()方法会释放锁的问题
+
+而这个Monitor对象也就是这个由C++实现的ObjectMonitor的底层是调用操作系统的mutex lock这个互斥锁来实现
+
+以上是对于synchronize实现同步代码块原理，那么我在说一下synchronize修饰方法的实现原理，同样反编译class文件会发下，被synchronize修饰方法多了一个ACC_SYNCHRONIZED标识符，当线程执行方法的时候检查方法有没有被标记ACC_SYNCHRONIZED标识符，如果没有标记那么正常执行，如果标记了，那么该线程就去尝试获取monitor对象，也就是获取对象锁子，事实上在本质上和使用monitorenter/monitorexit没有区别
+
+##### 8. synchronized为什么叫重量级锁
+
+在jdk1.6之前synchronized成为重量级锁，因为synchronize实现原理是**参考上条**，操作系统层面使用的是 Mutex lock这种互斥锁，使用互斥锁必然引起大量线程上下文切换，消耗大量CPU，所以会影响到性能
+
+1.6之后对synchronize进行了优化，有了锁升级概念，synchronize就没有以前那么重了
 
 ##### 9. *Synchroized锁升级过程
+
+jdk1.6为synchronize引入了无锁，偏向锁，轻量级锁、重量级锁
 
 ##### 10. *介绍CAS
 
