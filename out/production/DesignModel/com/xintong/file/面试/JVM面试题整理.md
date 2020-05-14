@@ -41,7 +41,7 @@
 
    - Mark Work
 
-     hashCode、gc分代年龄、偏向线程id、锁状态标志等信息
+     hashCode、gc分代年龄、锁状态标识、线程持有的锁、偏向线程id、偏向时间戳等信息
 
    - 类型指针
 

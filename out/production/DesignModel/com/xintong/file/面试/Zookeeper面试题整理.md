@@ -41,10 +41,6 @@
 2. ***Follower***：主要负责非事务操作（读操作），另外还会参加选举以及相应提议
 3. ***Observer***：一般来说这个角色不必存在，只有在读请求负载特别高的时候去配置Observer，但是这个Observer不选举也不提议，只负责读操作
 
-##### 6 CAP理论
-
-CAP原则又称CAP定理，指的是在一个分布式系统中，[一致性](https://baike.baidu.com/item/一致性/9840083)（Consistency）、[可用性](https://baike.baidu.com/item/可用性/109628)（Availability）、分区容错性（Partition tolerance）。CAP 原则指的是，这三个要素最多只能同时实现两点，不可能三者兼顾。
-
 ##### 7 Leader选举
 
 1. 初始化选举
