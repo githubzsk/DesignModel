@@ -60,12 +60,10 @@ MyBatis可以使用RowBounds对象分页，也可以使用pagehelper，也可以
 
 一对多再ResultMap中使用Collection
 
-##### 11.
+##### 11. MyBatis没有实现类如何运行？
 
-##### 12.
+是基于JDK的动态代理创建出一个代理的实现类去操作的。
 
-##### 13.
 
-##### 14.
 
  
