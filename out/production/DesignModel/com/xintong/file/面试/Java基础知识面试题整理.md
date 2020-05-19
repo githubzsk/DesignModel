@@ -2,18 +2,7 @@
 
 #### 1. 集合
 
-- **遍历arraylist时候安全删除其中一个元素**
 
-  for循环删除的话会产生元素跳跃，可能删不干净，foreach的话会引发快速失败机制，会抛异常
-
-  最好的方法要用迭代器Iterator去遍历删除
-
-- **集合和数组的区别**
-
-  1. 数组在声明的时候就已经规定了数据类型，而集合不需要
-  2. 数组只能存一种数据类型，而集合可以存Object类型
-  3. 数组可以存基本类型，而集合不可以存基本类型
-  4. 数组的大小在初始化的时候就已经固定，而集合容量是可以动态增减
 
 - **为什么要重写hashcode和equals/重写equals为什么一定要重写hashCode**
 
@@ -43,78 +32,7 @@
 
   2.可以提高哈希表的性能
 
-- **List实现排序有几种方式？**
-
-- **Comparable 和 Comparator**
-
-  Comparable叫做内部比较器，由需要排序的类实现Comparable并重写它的compareTo方法，之后就可以利用集合的工具类Collecttions.sort（list）进行排序了
-
-  ```` java
-  public class Persion implements Comparable<Persion>{
-      private Integer age;
-      private String name;
-      private Integer score;
-       @Override
-      public int compareTo(Persion o) {
-          return this.getAge() - o.getAge();
-      }
-  }
-   List<Persion> list = new ArrayList<>();
-          list.add(new Persion(22,"zsk",89));
-          list.add(new Persion(18,"zsk",20));
-          list.add(new Persion(27,"zsk",83));
-          list.add(new Persion(11,"zsk",75));
-          list.add(new Persion(31,"zsk",98));
-          Collections.sort(list);
-  ````
-
-  Comparator叫做外部比较器，不需要有需要被排序的类实现这个接口，对代码的侵入性更小
-
   
-
-  ```java
-   Collections.sort(list, new Comparator<Persion>() {
-              @Override
-              public int compare(Persion o1, Persion o2) {
-                  return o1.getScore()-o2.getScore();
-              }
-          });
-  ```
-
-- **List和Set**
-
-  第一点： list有序而set无序，之所以有这个特点，是因为它实现方式决定
-
-  List的实现类有ArrayList、LinkedList、Vector、数组跟链表，当然是有序了
-
-  Set的实现类有HashSet、TreeSet，哈希和树有它自己的算法，必然是无序了
-
-  第二点：List它是可以去存重复对象的，而Set则不能存重复，我们可以利用这一个特性来对list集合去重
-
-  第三点：List是可以存多个null值的，而Set值能存一个null值，这个也是因为它的实现方式决定的
-
-- **集合排序  arraylist排序**
-
-  通过内部比较器Comparable和外部比较器Comparator去实现
-
-- **ArrayList去重**
-
-  想那种用循环来处理的，我就不说了，我说点其他形式的。
-
-  第一种 Java8新特性，Stream的distinct方法去重，简单方便
-
-  ```java
-   List list = new ArrayList();
-          list.add("zsk");
-          list.add("zz");
-          list.add("zsk");
-          list.add("zsk");
-          list.add("zz");
-          list.add("zsk");
-          list.stream().map(x ->x+" ").distinct(). forEach(System.out::print);
-  ```
-
-  第二种
 
 - **为什么要有迭代器**
 

@@ -4,16 +4,21 @@ import java.util.*;
 
 public class ListTest {
     public static void main(String[] args) {
-        Set<String> set = new HashSet<>();
-        set.add("hah哈哈");
-        set.add("88");
-        set.add("bvcbv");
-        set.add("sdsd"); set.add("你好");
-        set.add("ads");
-        Iterator<String> iterator = set.iterator();
-        while (iterator.hasNext()){
-            System.out.println(iterator.next());
-        }
+        List<String> list = new ArrayList<>();
+        list.add("a");
+        list.add("b");
+        list.add("c");
+        list.add("d");
+        list.add("e");
+        list.add("f");
+        list.add("f");
+        list.add("h");
+        HashMap map = new HashMap();
+        map.put("","");
+  //      list.stream().map(x ->x+" ").distinct().forEach(System.out::print);
+
+        HashSet<String> strings = new HashSet<>(list);
+        strings.stream().map(x ->x+" ").forEach(System.out::print);
 
     }
 }
