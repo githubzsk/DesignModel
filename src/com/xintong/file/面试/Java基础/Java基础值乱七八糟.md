@@ -105,6 +105,8 @@ public class InnerSingleton {
 
 还有对象被GC回收前调用的finalize方法()
 
+clone getClass
+
 ##### 3. ==和equals
 
 对于基本类型的话使用==去比较
@@ -174,20 +176,29 @@ public class InnerSingleton {
 ##### 8. String为什么是final的
 
 1. 安全性
-   + 避免了继承而随意重写方法的安全隐患
-   + 避免对String进行修改造成的安全隐患
+   + String内部很多方法都是native，被重写很危险
+   + String实现线程安全
 2. 效率
    + 不能被修改可以实现字符串常量池，达到复用效果
-   + 不能被修改hashCode就不会变，
+   + 不能被修改hashCode就不会变，缓存于对象头中，提高效率
 
 ##### 9. String   StringBuilder StringBuffer区别
 
 1. String是不可变的，StringBuilder和StringBuilder是可变的，对于同一个对象可以进行append操作
 2. StringBuffer是线程安全的而StringBuilder多线程环境下是不安全的
 
-- 
+##### 10. 接口和抽象类的区别与联系
+
+相同点：都是对上层的抽象，都不能被实例化
+
+不同点：抽象类中可以为子类提供普通方法达到复用性，而接口中只能包含抽象方法，单继承多实现
+
+##### 11. 抽象类的意义
+
+给子类提供公用的模板，体现出通用性，有利于代码的规范化
 
 ##### 4. 设计模式
 
 - **模板模式**
 - **项目里用到的设计模式**
+
