@@ -197,8 +197,101 @@ clone getClass
 
 给子类提供公用的模板，体现出通用性，有利于代码的规范化
 
-##### 4. 设计模式
+##### 12. 设计模式
 
 - **模板模式**
 - **项目里用到的设计模式**
 
+##### 13. 代理模式
+
+1. 静态代理
+
+   ```java
+   //接口
+   public interface IStar {
+       void sing();
+   }
+   //真实对象
+   public class Jay implements IStar {
+       @Override
+       public void sing() {
+           System.out.println("Jay is singing");
+       }
+   }
+   //代理对象
+   public class ProxyManage implements IStar {
+   
+       private IStar iStar;
+   
+       public ProxyManage(IStar iStar){
+           this.iStar = iStar;
+       }
+       @Override
+       public void sing() {
+           System.out.println("proxy is ready to .....");
+           iStar.sing();
+           System.out.println("proxy end");
+       }
+   }
+   //客户端
+   public class Custom {
+       public static void main(String[] args) {
+           IStar iStar = new Jay();
+           ProxyManage proxyManage = new ProxyManage(iStar);
+           proxyManage.sing();
+       }
+   }
+   
+   ```
+
+2. JDK动态代理
+
+   1）实现InvocationHandler 
+
+   2）使用Proxy.newProxyInstance产生代理对象
+
+   3）被代理的对象必须要实现接口
+
+   ```java
+   //接口
+   public interface Subject {
+       void request() throws Exception;
+   }
+   //真实对象
+   public class RealSubject implements Subject {
+       public void request() {
+           System.out.println("RealSubject execute request()");
+       }
+   }
+   //实现InvacationHandler接口的代理对象
+   public class JdkProxySubject implements InvocationHandler {
+       private RealSubject realSubject;
+   
+       public JdkProxySubject(RealSubject realSubject) {
+           this.realSubject = realSubject;
+       }
+   
+       @Override
+       public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+           System.out.println("before");
+           Object result = null;
+           try {
+               result = method.invoke(realSubject, args);
+           } catch (Exception e) {
+               throw e;
+           } finally {
+               System.out.println("after");
+           }
+           return result;
+       }
+   }
+   ```
+
+3. CGlib动态代理
+
+   CGLIB基于ASM，对需要代理的类生成一个子类，覆盖其中的方法实现增强
+
+##### 14. JDK动态代理为什么要实现接口
+
+1. 想要去动态代理这个类，那么你的代理类必须通过继承/实现的方式去跟这个类产生关系，但是事实上动态产生的代理类已经继承了Proxy类，因为单继承的关系，这边你只能去实现接口
+2. 这个也可以体现出多态，面向接口编程

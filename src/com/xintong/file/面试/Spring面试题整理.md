@@ -47,21 +47,199 @@ Aop失效场景
 
 IOC （Inversion  of control）是一种思想，直译过来叫做控制反转，使用IOC的话可以达到控制反转和依赖注入，最终的目标可以实现对象之间的解除对象之间的高度耦合关系，比如说A对象需要B对象，如果不使用IOC容器的话，A对象得自己new，使用了IOC容器，A对象把自己创建B对象的这种控制权交给了IOC容器，让IOC容器帮它去new，然后注入到A对象中，从而实现解耦
 
-##### 5. *注入方式
+##### 6. *注入方式
 
-- 构造函数方法注入
-- Setter方法注入
+- 构造函数方法注入 xml中  property 
+- Setter方法注入 xml中 constructor-arg
 - 接口注入
+- 静态工厂
+- 实例工厂
 
-##### 5 *Spring事务失效原因场景
+##### 7. 自动装配
 
-##### 6 *Spring bean生命周期
+@Autowired，@Resource，@Inject，@Qualifier，@Named
 
-##### 7 *Spring如何解决bean的循环依赖
+Autowired（spring） 默认按照byType
 
-##### 9. Spring bean 的注入过程
+Resource（javaee） 默认按照byName
 
-##### 10. Spring的优点是什么
+Inject（javaee）默认按照byType
 
-##### 为什么有了JDK动态代理还要CGLIB
+##### 8 *Spring事务失效原因场景
+
+##### 9 *Spring bean生命周期
+
+大致分为四个步骤
+
+1. 实例化
+2. 属性赋值
+3. 初始化
+4. 销毁
+
+讲这些步骤之前，说一个额外知识点，spring容器在启动的时候，首先它会创建一个beanFactory，具体的实现叫做DefaultListableBeanFactory，还会去加载解析资源文件把所有的需要注入的bean信息采集过来封装成一个个beanDefination，存储到一个ConcurrentHashMap当中，这是容器刚开始启动要做的事儿，容器启动到尾声的时候，他才会去初始化一个个单例bean，spring对外提供了getBean的方法供我们获取bean，事实上在spring内部也是通过getBean来开始产生一个个bean的
+
+ getBean -> doGetBean ->createBean ->doCreateBean到这个doCreateBean方法的时候，springBean的生命周期正式开始
+
+1. 首先他会进行实例化，实例化的时候调用了一个叫做createBeanInstance的方法，这个方法通过反射机制，然后去创建出一个BeanWrapper对象，注意这个时候他只是一个bean的包装对象，而且是个空壳子，里面啥都没有
+
+   接下来会使用beanpostprocesser处理beanDefination还有进行缓存等等业务，我就不展开讲了
+
+2. 实例化之后会进行属性赋值，这一步调用了populateBean方法，这个方法调用栈很深，里面还会去递归的调用getBean方法解决对象之间的依赖问题，事实上bean之间的循环依赖，就是populateBean再加上三级缓存完成的
+
+3. 赋完值之后进行初始化，初始化的对应方法叫做initializeBean，也在这个doCreateBean方法内部，而这个初始化话中细分的话步骤还是比较多的
+
+   - ```java
+     //如果实现了Aware系列接口，首先他会处理这些
+     if (System.getSecurityManager() != null) {
+     			AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
+     				invokeAwareMethods(beanName, bean);
+     				return null;
+     			}, getAccessControlContext());
+     		}
+     		else {
+     			invokeAwareMethods(beanName, bean);
+     		}
+     //处理完Aware系列的问题，接着他会去处理BeanPostProcessorBefore
+     //至于BeanPostProcessor是Spring预留给我们的接口，我么可以利用这个接口启动容器的时候对bean进行
+     //特殊的修改，如果你需要的话
+     		Object wrappedBean = bean;
+     		if (mbd == null || !mbd.isSynthetic()) {
+     			wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
+     		}
+     //接着处理init方法相关的事情
+     		try {
+     			invokeInitMethods(beanName, wrappedBean, mbd);
+     		}
+     		catch (Throwable ex) {
+     			throw new BeanCreationException(
+     					(mbd != null ? mbd.getResourceDescription() : null),
+     					beanName, "Invocation of init method failed", ex);
+     		}
+     //之后会去处理BeanPostProcessorAfter
+     		if (mbd == null || !mbd.isSynthetic()) {
+     			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
+     		}
+     //刚说的这几步都是在initializeBean方法内部去执行的，也就是说这几部都属于初始化
+     ```
+
+4. 初始化完成之后会进行销毁的方法回调注册，注意这里只是注册，并不是销毁，销毁的时候会回调
+
+   这个步骤完成之后，bean就可以对外提供正常使用了
+
+   如果说bean要销毁的话，如果说你的bean实现了DisposableBean  /dɪˈspəʊzəbl/  接口，那么会执行你重写的destory方法，如果说你没实现这个接口，那么久执行你指定的destory方法，如果没有指定，啥都不做
+
+##### 10 *Spring如何解决bean的循环依赖
+
+spring容器在启动的时候，首先它会创建一个beanFactory，具体的实现叫做DefaultListableBeanFactory，还会去加载解析资源文件把所有的需要注入的bean信息采集过来封装成一个个beanDefination，存储到一个ConcurrentHashMap当中，这是容器刚开始启动要做的事儿，容器启动到尾声的时候，他才会去初始化一个个单例bean，spring对外提供了getBean的方法供我们获取bean，事实上在spring内部也是通过getBean来开始产生一个个bean的。
+
+spring 解决循环的依赖的所有代码都在getBean之中，具体是基于bean三级缓存和getBean中至少三处对于这个三级缓存操作的地方再加上一个populateBean这样一个方法来实现的
+
+我先说一下三级缓存
+
+```java
+// singletonObjects 单例缓存池
+// earlySingletonObjects 早期提前暴露的对象缓存
+// singletonFactories 单例对象工厂缓存
+```
+
+三个地方：两处doGetBean中，一处doCreateBean中刚创建完Bean外壳之后，
+
+populateBean：给bean注入属性的方法，位于doGetBean中，调用栈很深会递归调用getBean
+
+网上几乎绝大多数都是基于这三级缓存去讲，如果我也按照这样讲的话可能会听着有点绕，我呢可以从对getBean的宏观认识上，从另外一个角度去说一下处理循环依赖的问题，事实上它是基于递归的思想解决的
+
+比如说有三个对象 A 依赖 B 依赖 C 依赖 A，我们从A入手
+
+getBean（A） 实例化A  缓存A  populateBeanA 的时候发现了 B 
+
+getBean（B） 实例化B  缓存A populateBeanB 的时候发现了 C 
+
+getBean（C） 实例化C  缓存A populateBean 的时候发现了 A
+
+直接缓存中获取A 完成 populateBean C，完成实例化 C
+
+完成 populateBean B ，完成 populateBean A
+
+至此，解决完毕
+
+##### 11. Spring bean 的注入过程
+
+getBean走一波
+
+##### 12. Spring的优点是什么
+
+1. 首先它是一个非侵入性的，就意思你不用去实现它的接口或者继承他的类，当然你要是去实现特殊功能的bean，比如像实现spring的Aware系列接口去获取Spring提供的资源，又或者实现BeanPostProcessor之类的接口去实现特殊功能，这种情况我们不做讨论
+2. 第二呢就是他的核心之一IOC，他的ioc可以让我们代码之间的耦合度降到最低
+3. 第三就是他的Aop，打破OOP的限制，可以从切面入手统一实现功能增强
+4. 对事务操作有很好的支持
+5. 与其他框架很容易集成
+6. 生态圈大，基本上提供了一站式解决方案
+
+##### 13. 为什么有了JDK动态代理还要CGLIB
+
+jdk动态代理不支持类的代理，必须要你去实现接口
+
+##### 14. Spring 框架中都用到了哪些设计模式？ 
+
+（1）工厂模式：BeanFactory就是简单工厂模式的体现，用来创建对象的实例；
+
+（2）单例模式：Bean默认为单例模式。
+
+（3）代理模式：Spring的AOP功能用到了JDK的动态代理和CGLIB字节码生成技术；
+
+（4）模板方法：用来解决代码重复的问题。比如. RestTemplate, JmsTemplate, JpaTemplate。
+
+##### 15. Spring事务实现原理
+
+##### 16. Spring事务的种类
+
+支持声明式事务和编程式事务，更多的时候用于声明式事务使用注解搞定
+
+声明式事务 优点是基于注解，对代码没有侵入性，使用简单，缺点 最小粒度方法级别
+
+编程式事务 优点 可以细粒度到代码块级别，缺点 具有侵入性
+
+##### 17. spring的事务传播行为
+
+事务传播行为指的是 事务方法被嵌套进另一个方法的时候，应该如何传播
+
+通过Transactional注解的propagation  /ˌprɒpəˈɡeɪʃn/设置传播行为
+
+```java
+@Transactional(propagation = Propagation.REQUIRES_NEW)
+    REQUIRED(0),
+    SUPPORTS(1),
+    MANDATORY(2),
+    REQUIRES_NEW(3),
+    NOT_SUPPORTED(4),
+    NEVER(5),
+    NESTED(6);
+```
+
+##### 18. Spring中的隔离级别
+
+通过Transactional注解的isolation  /ˌaɪsəˈleɪʃn/设置隔离级别
+
+```java
+@Transactional(propagation = Propagation.REQUIRES_NEW)
+DEFAULT(-1),//默认使用数据库的隔离级别
+READ_UNCOMMITTED(1),//读已提交
+READ_COMMITTED(2),//读未提交
+REPEATABLE_READ(4),//可重复读
+SERIALIZABLE(8);//串行化
+```
+
+##### 18.
+
+##### 18.
+
+##### 18.
+
+##### 18.
+
+##### 18.
+
+##### 18.
+
+##### 18.
 
