@@ -65,7 +65,7 @@ Resource（javaee） 默认按照byName
 
 Inject（javaee）默认按照byType
 
-##### 8 *Spring事务失效原因场景
+
 
 ##### 9 *Spring bean生命周期
 
@@ -191,6 +191,25 @@ jdk动态代理不支持类的代理，必须要你去实现接口
 
 ##### 15. Spring事务实现原理
 
+##### 8 *Spring事务失效原因场景
+
+1. 使用类
+
+   - 非public方法会失效 如果走cglib动态代理，导致非public访问不到
+
+   - 被final修饰  导致cglib无法生成代理类集成该类，也会失效
+
+   - 通类中A调用B，A没有事务B有事务，那么B也会失效
+
+     原理是：事务基于Aop，Aop基于动态代理，这样调用的话，B方法相当于没走代理对象，所以失效
+
+2. 配置错误失效
+
+   - 使用了support  结果外围没事务，该方法也不走事务
+   - 使用了not_support 不管外层是否有事务，结果以非事务运行
+   - 使用了never
+   -  ssm项目 配置 context:component-scan包扫描重复扫描
+
 ##### 16. Spring事务的种类
 
 支持声明式事务和编程式事务，更多的时候用于声明式事务使用注解搞定
@@ -201,19 +220,40 @@ jdk动态代理不支持类的代理，必须要你去实现接口
 
 ##### 17. spring的事务传播行为
 
+required        required_new 
+
+supports 	  not_supports
+
+mandatory    never
+
+nested
+
 事务传播行为指的是 事务方法被嵌套进另一个方法的时候，应该如何传播
 
 通过Transactional注解的propagation  /ˌprɒpəˈɡeɪʃn/设置传播行为
 
 ```java
-@Transactional(propagation = Propagation.REQUIRES_NEW)
+@Transactional(propagation = Propagation.REQUIRED)
     REQUIRED(0),
+	// 支持外围事务，如果当前没有事务，就新建一个事务，这是最常见的选择
+	//1. 比如说A没事务调用B B传播行为是REQUIRED，那么A中出现的异常与B无关，B新建自己的事务，当然如果说你B
+	//   中自己抛异常了，那么肯定事务回滚
+	//2  比如说A有事务调用B B传播行为是REQUIRED，那么便会加入A的事务之中（内外事务形成整体）
+	//   任意一个事务出现异常都会回滚
     SUPPORTS(1),
-    MANDATORY(2),
+	// 支持外围事务，或者说跟随外围事务，外围有则有，外围没有则没有
+    MANDATORY(2),// /ˈmændətəri;/ 强制的
+	// 强制开启事务
     REQUIRES_NEW(3),
+	// 不管你外围方法有没有开始事务，内部方法始终都会新建自己的事务，不会跟你的外围事务产生关联
+	// 比如说A调用B，不管你A有没有事务，我B都会新建自己的事务，A中的异常和B无关，
+	// 当然B自己出现了异常回滚如果处理好了不会被外围感知，如果处理抛出来了肯定会影响A
     NOT_SUPPORTED(4),
+	// 不支持外围事务而且自身以非事务形式运行，也就是说不管你外围有没有事务，内层都是非事务
     NEVER(5),
-    NESTED(6);
+	// 禁止外围方法开启事务，一旦外围开启事务便抛异常
+    NESTED(6); /'nestɪd/ 嵌套事务
+	// 外围方法没有开启事务，内部方法则新建自己的事务，如果外围方法开启事务，一旦外围方法回滚，内部方法也回滚
 ```
 
 ##### 18. Spring中的隔离级别
@@ -229,11 +269,29 @@ REPEATABLE_READ(4),//可重复读
 SERIALIZABLE(8);//串行化
 ```
 
-##### 18.
+##### 18. Spring支持的几种bean的作用域
 
-##### 18.
+使用@Scope()注解配置
 
-##### 18.
+1. singleton 单例默认
+2. prototype  多例
+3. request 一个请求期间
+4. session 一个会话期间
+5. global-session
+
+##### 18.BeanFactory 和FactoryBean
+
+BeanFactory是bean工厂，在spring中的具体实现是DefaultListableBeanFactory，内部持有了一个ConcurrentHashMap中存了所有的beanDefination
+
+而FactoryBean是一个bean，一个特殊的bean，利用FactoryBean的id，getBean出来并不是FactoryBean本身，而是FactoryBean的getObject方法返回的对象，如果你想要FactoryBean本身，在id前加&
+
+FactoryBean具体应用 MyBatis的SQLSessionFactory，但是我们并不需要直接操作它，我们可以通过SqlSessionFactoryBean来获取 SQLSessionFactory，因为他的getObject方法就返回的是SQLSessionFactory
+
+##### 18.BeanFactory和ApplicationContext
+
+BeanFactory可以bean的加载，实例化，维护bean之间的依赖关系等基本功能
+
+而ApplicationContext也是间接的继承了这个BeanFactory并且还进行拓展比如国际化、Aware系列功能
 
 ##### 18.
 

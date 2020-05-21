@@ -202,3 +202,85 @@ clone getClass
 - **模板模式**
 - **项目里用到的设计模式**
 
+##### 代理模式
+
+1. 静态代理
+
+   ```java
+   //接口
+   public interface IStar {
+       void sing();
+   }
+   //真实对象
+   public class Jay implements IStar {
+       @Override
+       public void sing() {
+           System.out.println("Jay is singing");
+       }
+   }
+   //代理对象
+   public class ProxyManage implements IStar {
+   
+       private IStar iStar;
+   
+       public ProxyManage(IStar iStar){
+           this.iStar = iStar;
+       }
+       @Override
+       public void sing() {
+           System.out.println("proxy is ready to .....");
+           iStar.sing();
+           System.out.println("proxy end");
+       }
+   }
+   //客户端
+   public class Custom {
+       public static void main(String[] args) {
+           IStar iStar = new Jay();
+           ProxyManage proxyManage = new ProxyManage(iStar);
+           proxyManage.sing();
+       }
+   }
+   
+   ```
+
+2. JDK动态代理
+
+   jdk动态代理需要实现invacationHandler这个接口，它在运行的过程中动态产生代理类
+
+   ```java
+   //接口
+   public interface Subject {
+       void request() throws Exception;
+   }
+   //真实对象
+   public class RealSubject implements Subject {
+       public void request() {
+           System.out.println("RealSubject execute request()");
+       }
+   }
+   //实现InvacationHandler接口的代理对象
+   public class JdkProxySubject implements InvocationHandler {
+       private RealSubject realSubject;
+   
+       public JdkProxySubject(RealSubject realSubject) {
+           this.realSubject = realSubject;
+       }
+   
+       @Override
+       public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+           System.out.println("before");
+           Object result = null;
+           try {
+               result = method.invoke(realSubject, args);
+           } catch (Exception e) {
+               throw e;
+           } finally {
+               System.out.println("after");
+           }
+           return result;
+       }
+   }
+   ```
+
+   
