@@ -16,7 +16,7 @@ ComponentScan这个就不展开讲了，做ssm时候经常配扫描范围
 
 ##### 4 Configuration注解
 
-Configuration主要配合@Bean注解使用，多用于配置文件
+**使用** Configuration主要配合@Bean注解使用，多用于配置文件
 
 ##### 5 EnableAutoConfiguration注解
 
