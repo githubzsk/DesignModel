@@ -65,8 +65,6 @@ Resource（javaee） 默认按照byName
 
 Inject（javaee）默认按照byType
 
-
-
 ##### 9 *Spring bean生命周期
 
 大致分为四个步骤
