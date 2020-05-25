@@ -42,10 +42,12 @@ ComponentScan这个就不展开讲了，做ssm时候经常配扫描范围
 
 1. *匹配* ：EnableAutoConfiguration这个注解重点在于他被一个Import注解标注，Import注解作用是加载并注入对应的类，而他加载的哪个类会去读取META-INF下Spring.factories中所有能够自动装配的类的名字，然后跟你依赖的Jar去做匹配，匹配上了就会做配置
 
-2. *配置*：比如 说它匹配上了redis的配置，那么他就会加载它的配置类RedisAutoConfiguration，或者数据库的配置DataSourceAutoConfiguration，这种类必然会被Configuration注解标注，事实上他跟我们平时使用的配置类用Configuration标记是一模一样的道理，
+2. *配置*：比如 说它匹配上了redis的配置，那么他就会加载它的配置类RedisAutoConfiguration，或者数据库的配置DataSourceAutoConfiguration，这种类就是SpringBoot给我们提供的内部配置类，
 
-   不同的是，这种配置类必然还要使用EnableConfigurationProperties注解标注，EnableConfigurationProperties注解所包含的类，这个注解它引入了一个类，我们在yml或者properties文件中配置事实上就是对这个类进行属性配置，这个也是他加载我们自定义配置的一个原理
+   这种类必然在至少会被两种注解标注，一是Configuration，另一个是什么什么properties，Configuration不用说了就是我们平时用的配置注解，而什么什么properties他会为我们
 
+   引入了一个类，我们在yml或者properties文件中配置事实上就是对这个类进行属性配置，这个也是他加载我们自定义配置的一个原理
+   
    另外这种DataSourceAutoConfiguration类他还会使用@Bean注解去注入一些Bean，比如RedisTemplate我们不用自己注入就可以用，但是一般来他还会有ConditionalOnMissingBean的注解，这也就说明了我们如果自己配置了，就使用我们自己配置的类，不会使用它提供的默认的原理
 
 
