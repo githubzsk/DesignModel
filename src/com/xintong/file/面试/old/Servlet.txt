@@ -1,0 +1,210 @@
+一 什么是servlet
+	答：servlet是用于拓展web服务器功能的一种组件规范，它可以被web服务器加载执行，
+	因为web服务器只能够处理静态资源（html文档或者图片已经提前准备好的）的请求，
+	而servlet可以处理动态资源（需要通过计算，生成相应的html内容）请求。
+
+
+二 组件是什么?
+符合规范，实现部分功能，并且需要部署到相应的容器当中才能运行的软件模块。
+Servlet就是一个组件，需要部署到相应的Servlet容器当中才能运行。
+
+
+三 容器是什么?
+符合规范，提供组件运行环境的程序。
+Tomcat就是一个Servlet容器，提示Servlet的运行环境。
+
+四 servlet的生命周期
+	答 step1 默认情况下，当收到请求之后容器会去创建servlet实例
+		（也可以是在web.xml配置文件中对这个servlet进行配置
+		   load-on-startup，容器启动时创建servlet实例）
+	   step2 容器会调用该servlet的init方法进行初始化 调用一次
+           step3 容器会调用servlet的service或者doget dopost方法
+	   step4 容器在删除Servlet对象之前，会调用该对象的destroy方法，调用一次
+		
+
+五 get 和 post 请求
+    ①如何发送get请求
+	答：	 情形1: 直接在浏览器地址栏输入某个地址。
+   		 情形2: 表单默认提交的方式。
+   		 情形3: 点击链接。
+    ②如何发送post请求
+	答： 	 将表单的method属性设置为"post"
+    ③get请求和post请求的区别
+	答：	1、get请求会将参数放在浏览器地址栏，对于敏感信息来说的话不安全，而且提交的
+		   信息量比较少，大概2K左右
+		2、post请求会将参数放在实体内容里面，相对来说比get请求要安全一点，而且能提交
+		   大量的数据
+
+六 servlet输出中文
+	答 ：因为out在输出时，默认会使用"iso-8859-1"来编码，
+	需要设置，response.setContentType("text/html;charset=utf-8");
+七 表单提交中文
+	答：get请求 在servlet.xml配置文件里的设置connector标签中设置Encoding="utf-8"
+	    post请求 需要设置 requesst.setCharacterEncoding("utf-8")
+八 什么是重定向
+	答：response.sendRedirect(String url);
+	    服务器通知浏览器向一个新的地址发送请求。
+	    服务器可以通过发送302状态码和location消息头(值是一个地址，
+            一般称之为重定向地址)给浏览器,浏览器收到之后，会立即向重定向
+	    地址发送请求。
+
+	特点：a.重定向地址是任意的。
+              b.重定向之后，浏览器地址栏的地址会发生变化。
+	      c.重定向属于二次请求
+
+ 九 什么是转发
+	答： 一个web组件将未完成的处理交给另外一个web组件继续做。
+		step1 request.setAttribute(String name,Object obj);
+		step2 RequestDispatcher rd = request.getRequestDispatcher(String uri);
+		step3 rd.forward(request,response);
+	特点：b.转发的目的地必须属于同一个web应用。
+	      a.转发之后，浏览器地址栏的地址不变。
+
+ 十 转发和重定向的区别
+	答：首先的话重定向属于二次请求，是服务器以302状态码和location消息头的方式通知浏览器
+	    去访问这个重定向地址，这个地址它没有限制，浏览器的地址栏的地址也会变成重定向之后的地址
+	    而转发属于一次请求，也就是说转发的过程处于一次请求和一次响应之间，不管转发经历了
+	    多少个web组件，他们都是共用这个request和response的，它的地址只限于这个web应用之内
+	    地址栏的地址是不会改变的。
+
+ 十一 什么是jsp
+	答 ：jsp   sun公司制订的一种服务器端动态页面技术规范
+	他的全名是 java servlet pages（java服务器页面）其实他的本质也是servlte
+	因为容器会将jsp文件转换成一个对应的Servlet然后执行
+	我们使用servlet会有大量的out.print语句比较繁琐，使用jsp则避免了这种情况
+	把这些繁琐的工作交给了容器去做
+十二 什么是隐含对象
+	在jsp文件里面可以直接使用的一些对象，比如out,request,response。
+	（page,config,request,response,out,session,application,pageContext）
+	因为在容器要运行的时候，把jsp转换为对应的servlet的时候会自动的生成产生
+	这些隐含对象的代码
+十三 什么是指令
+	答：  通知容器，在将jsp转换成一个Servlet时，额外做一些处理，比如导包
+十四 jsp是如何运行的
+	答 ① 容器将jsp转化为对应的servlet
+	   ② 容器调用该servlet
+十五 什么是状态管理
+	答：将浏览器和服务器多次交互作为一个整体，把整个交互的过程中所产生的数据保存下来
+	    方式一：将状态保存在浏览器端(Cookie 小甜饼)。
+	    方式二: 将状态保存在服务器端(Session 会话)。
+十六 什么是Cookie
+	答： 服务器临时存放在浏览器端的少量数据。
+	     当浏览器访问服务器时，服务器会将少量数据以set-cookie消息头的
+	     形式发送给浏览器，浏览器会将这些数据临时保存下来；
+             当浏览器再次访问服务器时，会将这些数据以cookie消息头的形式发
+	     送给服务器。
+		
+		Cookie c = new Cookie(String name,String value);    
+		注:
+		  Cookie只能存放字符串。
+		response.addCookie(c);
+		Cookie[]  request.getCookies();
+		String cookie.getName();
+		String cookie.getValue();
+		cookie.setMaxAge(int seconds);  大于 小于 等于0
+
+十八 Cookie的限制
+	
+		a.可能被用户禁止。
+	        b.不安全。
+		  因为Cookie保存在浏览器端，并且不会加密。所以，对于敏感数据，
+		如果一定要以Cookie的方式保存在浏览器端，一定要加密。
+		c.大小有限制。
+		  Cookie只能保存约4k左右的数据。
+		d.数量也有限制。
+		 大约是几百个。
+		e.只能存放字符串。
+
+十九 什么是Session
+
+		答：	Session是什么?
+			HttpSession s = request.getSession();
+			服务器端为了保存用户状态而创建的一个特殊的对象。
+			当浏览器访问服务器时，服务器创建一个Session对象(该对象有一个
+			唯一的id,称之为SessionId),接下来，服务器会将SessionId以
+			Cookie的方式发送给浏览器。
+			当浏览器再次访问服务器时，会将SessionId发送过来，服务器依据
+			SessionId找到对应的Session对象。
+二十 比较Cookie和Session
+		答：	session相对于cookie,优点是安全、保存的数据量更大、支持更丰富的
+			数据类型。缺点是session将状态保存在服务器端，如果用户量过多，可能
+			会占用过多的内存空间。
+二十一  过滤器是什么?
+
+		  答 ：是一种特殊的组件、用于拦截Servlet容器的调用过程。容器收到请求之后，
+		       如果有过滤器，会先调用过滤器，然后再调用Servlet。
+		  优点： ①可以在不改变源代码的情况下增加部分简单
+			 ②可以将多个模块相同的功能集中写在过滤器里面，方便代码的 维护。
+
+二十二   什么是监听器?
+
+		答：是一种特殊的组件、用于监听Servlet容器产生的事件并 进行相应的处理。
+
+		  容器产生的事件主要分为两类:
+		 a.生命周期相关的事件:		
+			   容器创建了或者销毁了request、session、servlet上下文时
+			 产生的事件。
+		 b.绑订数据相关的事件：
+		   调用了request、session、servlet上下文的setAttribute和
+			removeAttribute方法时产生的事件。
+二十三	什么是servlet上下文?
+		答： 当容器启动之后，会为每一个web应用创建唯一的一个符合
+		     ServletContext接口要求的对象，该对象会一直存在，除非
+		     容器关闭。
+                获取servlet上下文?
+			GenericServlet、ServletConfig、FilterConfig、
+			HttpSession都提供了一个方法(getServletContext)来获得
+			servlet上下文。
+二十四   sevlet上下文的作用
+		答： ① 绑定数据
+			注：request、session以及servlet上下文都提供了绑订数据相关的方法
+			(setAttribute、getAttribute、removeAttribute)
+			区别一：生存的时间长度不一样。request < session < servlet上下文
+			区别二：绑订到session对象上的数据只有与该session对应的用户能访问到，
+				绑订到servlet上下文上的数据可以被所有用户共享(都能访问到)。
+		    ②读取全局的初始化参数。
+
+
+二十五 servlet线程安全问题
+		答：    a.默认情况下，容器只会创建一个Servlet实例。
+			b.容器收到一个请求，就会启动一个线程来处理该请求。
+			如果有多个请求同时去访问某个Servlet,容器就会启动多个线程同时
+			调用该Servlet，就有可能产生线程安全问题，比如，这些线程同时去修改
+			该Servlet的某个属性值。
+		解决 使用synchronized对有可能产生线程安全问题的代码加锁。
+
+二十六 jsp标签是什么?
+		答 ：jsp标签是一种用来替换jsp中java代码的技术，
+		    容器遇到jsp标签之后，会调用jsp标签对应的标签类中的java代码。
+
+		好处
+		 
+			 a.利于jsp文件的维护：比如，将包含有java代码的jsp交给美工
+			   去修改，就很不方便。使用jsp标签之后，jsp文件不再包含有
+			   java代码了。
+			 b.利于java代码的复用: 比如，可以开发一些具有常见功能的jsp标签，
+			   可以在不同的应用中复用
+二十七   el表达式是什么?
+		答：	是一套简单的运算规则，用于给jsp标签的属性赋值，也可以脱离jsp标签
+			直接使用。
+二十八  什么是MVC（model view controller）
+		答：MVC是一种软件架构思想 他的核心思想是，在设计一个软件的时候，
+		    应该将数据处理与数据展现分开
+		    模型负责数据处理
+		    视图负责数据展现
+		    控制器则介于两者之间负责协调模型和视图
+		    当控制器收到请求之后会调用相应的模型来处理数据
+		    处理完之后会交给控制器，控制器再选择相应的视图来进行展现
+二十九  MVC的优缺点
+		答 优点：①方便测试 将业务逻辑写在model里面直接测试，写在servlet
+			 里面还需要部署
+			 ②方便代码的维护。
+		           模型或者视图发生改变，不会彼此影响。
+			 ③模型返回的处理结果，可以使用不同的方式来展现。
+			 ④方便分工协作。
+		   缺点：使用MVC，会增加代码量，增加软件设计的难度，相应增加软件的开发成本，
+			  所以只有具有一定规模、并且需要良好的维护性和扩展性的软件，才需要使用 MVC
+
+	
+
+           

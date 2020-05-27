@@ -1,0 +1,28 @@
+一 什么是SpringMVC
+	答：SpringMVC是Spring的一个模块，它是基于MVC架构思想用来简化web应用程序开发的应用开	   发框架
+
+
+
+二  SpringMVC工作流程
+	①请求发送到DispatcherServlet的时候
+	②DispatcherServlet会调用处理器映射器HandlerMapping
+	③HandlerMapping根据请求url找到具体的处理器Handle，
+	④找到以后处理器映射器（HandlerMappering）像前端控制器返回执行链	（HandlerExecutionChain）
+	⑤前端控制器（DispatcherServlet）调用处理器适配器（HandlerAdapter）去执行处理器	（Handler）
+	⑥Handler执行完给处理器适配器（HandlerAdapter）返回ModelAndView
+	⑦处理器适配器向前端控制器返回ModelAndView
+	⑧前端控制器会调用视图解析器（ViewResolver）去进行视图解析
+	⑨解析完之后会向前端控制器返回View
+	⑩DispatcherServlet会将View进行渲染之后再响应给客户
+三 Spring的重要组件
+	①前端控制器 DispatcherServlet（不需要程序员开发）作用：接收请求、响应结果 相当于转	  发器，有了DispatcherServlet 就减少了其它组件之间的耦合度。
+	②处理器映射器HandlerMapping（不需要程序员开发）作用：根据请求的URL来查找Handler
+	③处理器适配器HandlerAdapter注意：在编写Handler的时候要按照HandlerAdapter要求的规则	  去编写，这样适配器HandlerAdapter才可以正确的去执行Handler。
+	④处理器Handler（需要程序员开发）
+	⑤视图解析器 ViewResolver（不需要程序员开发）作用：进行视图的解析 根据视图逻辑名解	 	  析成真正的视图（view）
+	⑥视图View（需要程序员开发jsp）View是一个接口， 它的实现类支持不同的视图类型（jsp，		freemarker，pdf等等）
+
+四 SpringMVC如何实现重定向和转发
+	答 转发：在返回值前面加"forward:"就可以让结果转发,
+	   	 譬如"forward:user.do?name=method4" 
+ 	   重定向：在返回值前面加"redirect:"就可以让返回值重定向,譬	            如"redirect:http://www.baidu.com"
