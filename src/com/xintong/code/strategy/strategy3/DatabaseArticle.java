@@ -21,7 +21,8 @@ public enum DatabaseArticle implements Article {
     ITEM17(17,"行锁跟表锁区别 "),
     ITEM18(18,"为什么用B+树，不用其他类型"),
     ITEM19(19,"MyiSAM和innodb区别"),
-    ITEM20(20,"磁盘读取原理");
+    ITEM20(20,"磁盘读取原理"),
+    ITEM21(20,"left join，right join，inner join");
     DatabaseArticle(int id,String name){
         this.id = id;
         this.name = name;

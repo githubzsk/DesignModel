@@ -1,0 +1,219 @@
+﻿①   SQL分类
+	.DDL数据定义语言：create drop alter truncate 不支持事务
+	.DML数据操作语言：insert update delete select(DQL) 支持事务
+	.DQL数据查询语言：select
+	.TCL事务控制语言：commit rollback ...
+	.DCL数据控制语言：分配用户权限相关SQL
+
+② ###去重 distinct
+- 去掉重复的数据
+	select distinct job from emp;
+
+③  什么是事务
+	答：直白点的说，事务就是一组操作的集合，而且这组操作必须全部执行成功否则回滚到所有操作前的状态
+	    事务具有ACID属性
+ 
+④  什么是ACID属性
+	答：原子性：事务是关系型数据库中最小的执行单元，事务中的所有操作要么全部成功，要么全部失败回滚，
+	不可能只执行一半，就比如说经典的转账问题
+	    一致性：是指数据从一个一致状态转到另一个一致状态，转账问题。
+	    隔离性：一个事务所做的修改在最终提交以前，对其他事务是不可见的，也就是说多个事务之间是不影响的。
+	    持久性：事务一旦提交将是永久性的。
+⑤
+and（并且） 和 or（或者）
+
+•查询工资小于2000并且是10号部门的员工信息
+
+select * from emp where sal<2000 and deptno=10;
+•查询有奖金comm 或者 工资大于3000的员工姓名，工资，奖金
+
+select ename,sal,comm from emp where comm is not null or sal>3000;
+⑥ in
+•查询工资为800，3000，5000，1600的所有员工信息
+
+select * from emp where sal=800 or sal=3000 or sal=5000 or sal=1600;
+
+select * from emp where sal in (800,3000,5000,1600);
+ ⑦
+ between x and y 包含x和y
+•查询某个字段的值在两个数值之间的时候使用
+
+•查询员工工资在2000至4000之间的员工信息
+
+select * from emp where sal between 2000 and 4000;
+
+⑧ 
+like
+	 用来进行模糊查找
+	_： 代表单个未知字符
+	%： 代表0或多个未知字符
+⑨
+排序 order by
+默认升序
+ asc 升序 desc降序
+⑩
+分页查询 limit
+•limit 跳过条数,每页条数 
+
+•limit 通常写在sql语句的最后面
+
+•查询工资排名前三名的三位员工的信息 select * from emp order by sal desc limit 0,3;
+11  ifnull函数
+•age=ifnull(x,y) 如果x的值为null则age=y,如果不为null则age=x;
+
+•修改员工表的奖金，如果奖金值为null修改成0不为null则不变
+
+  update emp set comm=ifnull(comm,0);
+
+
+12 分组查询
+	group by
+	查询每个x的什么
+	select x，字段1，字段2，字段3  from  表名 where 什么=什么 group by x；
+	
+13 关联查询
+	
+	等值连接 select * from A,B where A.x=B.x and A.y=xxx;
+				   where（等值条件）and 查询条件
+	内连接 select * from A join B on A.x=B.x where A.y=xxx;
+				      on（等值条件）where 查询条件
+	外连接 select * from A left/right join B on A.x=B.x where A.y=xxx;
+14 什么是视图及其好处
+	答 视图的实质就是一条sql语句，我们可以理解为一张虚拟的表，它
+	   的数据源于表，对于某些比较长的sql语句来说，利用视图可以提高我们的
+	   工作效率
+	create view 视图名 as 子查询;
+	-创建10号部门员工的视图
+	create view v_emp_10 as (select * from emp where deptno=10);
+15 修改视图
+
+
+	- 格式： create or replace view 视图名 as 子查询;
+	create or replace view v_emp_20 as (select * from emp);
+16 
+	视图别名
+- 如果创建视图的时候使用了别名 则后面的各种操作只能使用别名
+
+	create view v_emp_20 as (select ename name,sal from emp);
+
+	update v_emp_20 set name='aaaa' where name='钢铁侠';//成功！
+	update v_emp_20 set ename='aaaa' where ename='钢铁侠';//失败！
+17 数据污染
+	在视图中插入一条原表可见而视图不可见的数据
+	如何防止？：可以在后面加with check option 防止视图污染
+	PS：增删改与表相同
+18 什么是索引
+	索引是数据库中用来提高查询效率的一种技术，类似于我们书的目录
+	我们可以根据索引快速定位到我们想要的数据，
+
+19
+	如何创建索引 
+-	 create index 索引名 on 表名(字段名(长度));
+	-给title字段添加索引
+		create index index_item2_title on item2(title);
+	-再次查询看时间多少？ 0.04秒 提高近30倍
+		select * from item2 where title='100';
+ 
+	查看索引
+	show index from item2;
+	删除索引
+	-格式：drop index 索引名称 on 表名;
+
+	drop index index_item2_title on item2;
+
+20 JDBC
+	- 注册驱动
+	- 获取连接对象
+	- 创建sql执行对象
+	- 执行sql语句
+	- 关闭资源
+	
+		//1.注册驱动
+		Class.forName("com.mysql.jdbc.Driver");
+		//2.获取连接对象
+		Connection conn = 
+				DriverManager.getConnection(
+					"jdbc:mysql://localhost:3306/db3", 
+						"root", "root");
+		//3.创建sql执行对象
+		Statement stat = conn.createStatement();
+		//4.执行sql
+		stat.execute("drop table if exists jdbct2");
+		System.out.println("删除成功！");
+		//5. 关闭资源
+		stat.close();
+		conn.close();
+21 数据库设计三范式
+	答 第一范式是指表中的所有字段是原子的不可再分的。
+	   第二范式是指表中有主键而且非主键的字段依赖主键而不能去依赖其他字段。
+	   第三范式是指每个字段与主键有着直接关系，不能存在依赖传递关系。
+
+	###day01
+1. 数据库相关
+- show databases;
+- create database db1 character set utf8/gbk;
+- show create database db1;
+- drop database db1;
+- use db1;
+2. 表相关
+- create table t1 (id int,name varchar(10)) engine=myisam/innodb charset=utf8/gbk;
+- show tables;
+- show create table t1;
+- desc t1; 
+- drop table t1;
+- rename table t1 to t2;
+- alter table t1 engine=myisam/innodb charset=utf8/gbk;
+- alter table t1 add age int;
+- alter table t1 drop age;
+- alter table t1 change age xxx int;
+- alter table t1 modify age int first/after xxx;
+3. 数据相关
+- insert into t1 (字段名1,字段名2) values(值1,值2),(值1,值2);
+- select * from t1;
+- update t1 set age=28 where id=10;
+- delete from t1 where id=10;
+###day02
+- 注释 comment
+- `和'
+- 冗余   重复数据   拆分表
+- SQL分类
+1. DDL：数据定义语言，包括create drop alter truncate, 不支持事务
+2. DML：数据操作语言，包括insert delete update select(DQL) 支持事务
+3. DQL：数据查询语言，只有select
+4. TCL：事务控制语言，
+5. DCL：数据控制语言，分配用户权限相关
+- 数据类型：
+1. 整数：int(m) bigint(m)  m显示长度 结合 zerofill
+2. 浮点数：double(m,d) decimal   m代表总长度 d点小数长度、
+3. 字符串： char 长度不可变 最大255 varchar长度可变 最大65535 text 长度可变 最大65535
+4. 日期： date time datetime：默认值null 最大9999-12-31 timestamp：默认值当前时间 最大2038-1-19
+5. 其它
+###day03
+1. is null 和 is not null
+2. 别名 
+3. distinct
+4. 比较运算符  > <  >= <= =  !=,<>
+5. and 和 or
+6. in  
+7. between x and y  
+8. like  _  %
+9. 排序  order by  字段名 升序asc/desc;
+10. limit 跳过条数，每页条数
+11. 日期   now()   curdate() curtime()  extract(year/month/day/hour/minute/second from now())  date_format(now(),'%YymcdHhis')  str_to_date()
+12. ifnull(x,y)
+13. 聚合  sum()  avg()  max() min() count()
+14. 字符串 concat()  char_length()  instr() locate() insert() left() rigth() substring()  upper() lower()  trim()  repeat() replace() reverse()
+15. 数学相关  floor()  round()  truncate() rand()
+###day04
+1. 分组查询  group by 
+2. having  
+3. 子查询      where/having后面    创建表的时候    from后面
+4. 关联查询： 
+- 等值连接：select * from A,B where A.x=B.x and A.y=xxx
+- 内连接:select * from A join B on A.x=B.x where A.y=xxx
+- 外连接:select * from A left/right join B on A.x=B.x where A.y=xxx
+###day05
+1. 关联关系： 1对1 1对多 多对多
+2. 自关联
+3. 连接方式：等值连接 内连接 外连接
+4. 权限管理： 三张主表：角色表 用户表 权限表   用户和角色关系表  角色和权限关系表

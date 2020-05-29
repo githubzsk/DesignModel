@@ -1,0 +1,16 @@
+	Q1 什么是JDBC
+		A：JDBC的英文全称Java DataBase Connectivity ，翻译过来叫做Java数据库链接
+		   实质上呢它就是一套Java程序与数据库连接的一套api
+	Q2 JDBC 连接数据库的步骤
+		A：① 利用反射机制进行加载驱动 ClassForName，就拿我常用的MySQL为例，去加载
+		  	com.mysql.jdbc.Driver这个类，因为使用到反射所以我们得处理一个			ClassNotFoundException
+		   ② 获得连接对象  使用DriverManager的   静态方法GetConnection，里面需要我
+		      们填参数，jdbc：mysql：//地址：端口/数据库名，账号，密码
+		   ③ 获得sql语句执行对象   用连接对象Conn的createStatement
+		   ④ 执行sql语句使用executeQuery或者executeUpdate，executeQuery
+		      的话会返回一个ResultSet结果集，我么可以对它进行处理
+		   ⑤ 关闭连接
+	Q3 Statement和PrepareStatement的区别
+		A：①PrepareStatement是预编译的Sql语句，效率要高于Statement
+		   ②PrepareStatement支持问号操作符，灵活性大于Statement
+		   ③PrepareStatement可以有效防止SQL注入（因为采用了预编译，始终保持与的					关	系）

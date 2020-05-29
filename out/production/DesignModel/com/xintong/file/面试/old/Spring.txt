@@ -1,0 +1,63 @@
+一  什么是Spring
+	答：它是一个开源的轻量级简化开发的企业级框架，主要用于开发JAVA应用
+		 目的是简化Java企业级应用开发
+	  
+二  Spring创建管理对象的三种方式
+	答： ①最常用的的是使用无参的构造方法创建对象（重点）
+		通过反射的机制，使用无参的构造方法创建的对象
+		<bean id="" class=""/>
+	     ②使用静态工厂实例化对象
+	     ③使用实例工厂方法实例化对象
+三  依赖注入的方式
+	答	①通过SET方法注入（重要）需要配置文件中<property>节点时其中的name的值为
+		   该属性的set方法后半截
+		②通过有带参数的构造方法注入,需要配置constructor节点 index 和 value
+		   <constructor-arg 
+			index="0"
+			value="Jackson" />
+		③通过接口注入
+四 spring的核心类有哪些？
+	答
+	①BeanFactory：产生一个新的实例，可以实现单例模式
+	②BeanWrapper：提供统一的get及set方法
+	③ApplicationContext:提供框架的实现，包括BeanFactory的所有功能
+五 spring 的核心组件
+	答	
+		①Bean组件：
+			Bean的创建及管理
+		②Context组件：
+			context是一个bean关系的集合，处理每个bean之间的关系
+		③Core组件：
+			处理个bean之间的关系所需要的一些工具
+五 spring的配置方式（如何给Spring 容器提供配置元数据?）
+	答 ：
+		①基于XML的配置
+		   在xml文件中配置<Beans>标签 bean id和class
+		②基于注解的配置
+		  <  context:component-scan base-						   package="cn.tedu.store.service"></context:component-scan>
+		   通过此标签写需要扫描的包，然后在类上写上对应的注释（service、controller		   等）
+		③基于Java的配置
+六 什么是自动装配
+	答 ：自动装配表示自动的为所有属性注入值，我们不需要在Spring的配置文件中去配置各个	    	   `<property>`节点！只需要在对应的`<bean>`节点中配置`autowire`属性或者在对应的属性	    上面使用Autowired注释（需要<context:annotation-config />）就可以了
+七 spring bean的生命周期
+	答 spring bean factory负责管理spring容器中中bean的生命周期，当一个bean被创建后需要执行一系列初始化操作达到一个可用的状态，
+八 什么是springIOC容器
+	答
+ 		 IOC是指把对类的对象的创建和管理的权利交给IOC容器，所以他叫做控制反转，IOC和DI（依赖注入）是分不开的	  		  ，应用程序会依赖IOC容器为其属性注入一些外部资源
+九 IOC的优缺点
+	答：优点  实现组件之间的解耦，提高程序的灵活性和可维护性。
+	    缺点: ① 因为控制反转，所以创建管理对象看起来没有传统意义上的直观
+		  ② 因为使用反射来创建对象，所以在效率上会有些损耗。但相对于程序的灵活性和可维护性来说，这点损耗是微不足道的
+十 Spring的优点？
+	
+答：1.降低了组件之间的耦合性 ，实现了软件各层之间的解耦?
+	    2.可以使用容易提供的众多服务，如事务管理，消息服务等?
+	    3.容器提供单例模式支持?
+	    4.容器提供了AOP技术，利用它很容易实现如权限拦截，运行期监控等功能?
+	    5.容器提供了众多的辅助类，能加快应用的开发?
+	    6.spring对于主流的应用框架提供了集成支持，如hibernate，JPA，Struts等?
+	    7.spring属于低侵入式设计，代码的污染极低?
+	    8.独立于各种应用服务器?
+	    9.spring的DI机制降低了业务对象替换的复杂性?
+	    10.Spring的高度开放性，并不强制应用完全依赖于Spring，开发者可以自由选择spring
+的部分或全部?
