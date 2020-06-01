@@ -1,11 +1,15 @@
 package com.xintong.code.strategy.strategy3;
 
 import java.util.HashMap;
+import java.util.concurrent.Semaphore;
 
 public class Application {
-    public static void main(String[] args) {
-        ArticleCenter center = new ArticleCenter( DatabaseArticle.GETINSTANCE);
-        String message = center.getMessage((int) (Math.random() * DatabaseArticle.values().length+1));
+   static Semaphore semaphore = new Semaphore(5);
+    public static void main(String[] args) throws InterruptedException {
+        semaphore.acquire();
+        semaphore.release();
+        ArticleCenter center = new ArticleCenter( JMMArticle.GETINSTANCE);
+        String message = center.getMessage((int) (Math.random() * JMMArticle.values().length+1));
         System.out.println(message);
 
         HashMap map = new HashMap();
