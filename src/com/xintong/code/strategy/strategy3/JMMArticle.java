@@ -15,7 +15,7 @@ public enum JMMArticle implements Article {
     ITEM11(11,"11sleep、wait区别"),//1
     ITEM12(12,"12为什么wait在Object中"),//1
     ITEM13(13,"13Runnable和Callable区别"),//1
-    ITEM14(14," 14线程池原理 核心参数？"),//
+    ITEM14(14,"14线程池原理 核心参数？"),//
     ITEM15(15,"15线程池线程复用原理"),//1
     ITEM16(16,"16四种线程池区别"),//1
     ITEM17(17,"17线程池使用的队列"),//

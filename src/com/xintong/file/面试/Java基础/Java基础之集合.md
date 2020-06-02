@@ -60,7 +60,7 @@ Comparator叫做外部比较器，不需要有需要被排序的类实现这个�
 
 ##### 4. Vector & ArrayList 
 
-相同点：都是基于数组实现
+相同点：都是基于数组实现，初始化都是10	
 
 不同点：Vector对外的方法都是假synchronized的，线程安全，而ArrayList线程不安全
 

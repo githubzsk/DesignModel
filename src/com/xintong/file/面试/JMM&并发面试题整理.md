@@ -449,7 +449,7 @@ protected <T> RunnableFuture<T> newTaskFor(Callable<T> callable) {
 
 
 
-##### AQS
+##### 21. 什么是AQS
 
 AQS全称叫做 **AbstractQueuedSynchronizer**  `/kjuː/ /'sɪnkrənaɪzɚ/` 直译过来叫做**抽象队列同步器** ，事实上也确实如此它提供了一个FIFO的队列，而基于AQS实现了juc下很多重要组件，比如ReentrantLock可重入锁、ReentrantReadWriteLock可重入读写锁、Semaphore信号量、CountDownLatch等等的重要组件
 
@@ -461,7 +461,7 @@ CLH队列:基于CLH锁实现的队列
 
 
 
-Semaphore
+##### 22. Semaphore
 
 它的作用是通过acquire和release来对某段代码进行限流限制，也就是说可以去限制同时执行这块代码的线程数量
 
@@ -486,7 +486,7 @@ public static  void active(){
 }
 ```
 
-CountDownLatch
+##### 23. CountDownLatch
 
 主要可以用于控制线程的执行顺序，比如CountDownLatch设置为2次。那么在AB线程中调用countDown，在C线程中调用await，那么C线程会阻塞在await方法处，直到AB线程都执行了countDown之后。
 
@@ -531,3 +531,10 @@ public static void main(String[] args) {
 }
 ```
 
+##### 22. JUC下常见组件
+
+并发容器 ConcurrentHashMap CopyOnWriteArrayList
+
+同步工具 Semaphore CountDownLatch CyclicBarrier
+
+原子变量类 Atomic系列

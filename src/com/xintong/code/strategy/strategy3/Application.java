@@ -8,10 +8,9 @@ public class Application {
     public static void main(String[] args) throws InterruptedException {
         semaphore.acquire();
         semaphore.release();
-        ArticleCenter center = new ArticleCenter( JMMArticle.GETINSTANCE);
-        String message = center.getMessage((int) (Math.random() * JMMArticle.values().length+1));
+        ArticleCenter center = new ArticleCenter(JVMArticle.GETINSTANCE);
+        String message = center.getMessage((int) (Math.random() * JVMArticle.values().length+1));
         System.out.println(message);
-
         HashMap map = new HashMap();
         map.put("","");
 

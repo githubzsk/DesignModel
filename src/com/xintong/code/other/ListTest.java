@@ -10,7 +10,10 @@ import java.util.*;
 public class ListTest {
     public static void main(String[] args) {
         StackOverflowError error;
-        List<String> list = new ArrayList<>();
+        ArrayList<String> list = new ArrayList<>();
+        List<String> vector = new Vector<>();
+
+        vector.add("");
         list.add("a");
         list.add("b");
         list.add("c");
@@ -38,7 +41,7 @@ public class ListTest {
         }
         System.out.println(file);
         HashSet<String> strings = new HashSet<>(list);
-        strings.stream().map(x ->x+" ").forEach(System.out::print);
+ //       strings.stream().map(x ->x+" ").forEach(System.out::print);
 
     }
 }
