@@ -17,10 +17,10 @@
 
 redis支持五种数据结构 string (字符串)、list (列表)、set (集合)、hash (哈希) 和 zset (有序集合)
 
-- string（字符串）： 这个是最基本redis最基本的一个数据结构，也是我们用的最多的一个类型
-- list（列表）：参考Java里的LinkedList，由一个双向链表实现，根据链表的特点，它增删快查询慢
+- string（字符串）： 这个是最基本redis最基本的一个数据结构，也是我们用的最多的一个类型，value最大521M，存图片地址，存对象(json)，incr/decr做计数器，分布式锁，使用分布式锁
+- list（列表）：参考Java里的LinkedList，由一个双向链表实现，根据链表的特点，它增删快查询慢，2^32-1个，也就是4294967295个。消息队列（基本上很少有人这样做），使用站点列表
 - set（集合）：参考Java里的HashSet,同样也是无序的
-- zset（有序集合）：首先它是一个set，保证了每个value的唯一性，另外他可以给每个value设置一个score而根据score排序
+- zset（有序集合）：首先它是一个set，保证了每个value的唯一性，另外他可以给每个value设置一个score而根据score排序，排行榜 告警排行榜
 - hash（字典）：参考Java的HashMap，数组+链表实现
 
 ##### 3. *Redis持久化方式
@@ -28,6 +28,8 @@ redis支持五种数据结构 string (字符串)、list (列表)、set (集合)�
 1. ***RDB（snapshot快照）***：保存了某一时刻Redis内存中的数据持久化到一个rump.rdb文件中，当然这个可以设置自动，也可以手动
 
    - 自动：在redis.conf文件中可以配置save  num num，它的意思是说在多少秒之内产生过多少次数据变更就会触发rdb
+
+     save 60 10000 #在60秒(1分钟)之后，如果至少有10000个key发生变化，则dump内存快照
 
    - 手动：可以使用sava 或者bgsave指令 但是save会发生线程阻塞，所以一般不使用，而bgsave是进行异步rdb在后台操作，所以说如果手动的话还是建议使用bgsave
 
@@ -129,7 +131,7 @@ Sentinel集群正常运行期间，每个Sentinel实例事实上是平等的，�
    - 带上自己的epoch让别的Sentinel节点为自己投票
    - 投自己一票
 3. 如果其他Sentinel给Candidate投了票，那么其他Sentinel在本轮中就是Follower
-4. Candidate会不断统计自己票数，在超时时间内，如果一旦自己的票数过半切超过quorum，那么这个Candidate就转变为Leader
+4. Candidate会不断统计自己票数，在超时时间内，如果一旦自己的票数过半切超过quorum(法定人数)，那么这个Candidate就转变为Leader
 5. 如果一旦超时，那么便进行下一轮选举，直至选出Leader
 
 ##### 14. Redis有哪些架构模式及其特点？
@@ -167,6 +169,28 @@ Sentinel集群正常运行期间，每个Sentinel实例事实上是平等的，�
 
    ​					3、使用对于热点key查询之前使用setnx指令，
 
+   ```java
+   //获取不到不要去数据库拿，先用setnx锁住，然后再从数据库拿，拿到了再存，完了再删setnx
+   String get(String key) {
+       String value = redis.get(key);
+       if (value  == null) {
+           if (redis.setnx(key_mutex, "1")) {
+               // 3 min timeout to avoid mutex holder crash    
+               redis.expire(key_mutex, 3 * 60)
+               value = db.get(key);
+               redis.set(key, value);
+               redis.delete(key_mutex);
+           } else {
+               //其他线程休息50毫秒后重试    
+               Thread.sleep(50);
+               get(key);
+           }
+       }
+   } 
+   ```
+
+   
+
 3. _缓存雪崩_：
 
    _原因_: 缓存服务器down掉，或者缓存集体到期？总之就是缓存大面积失效，大量的请求直接打到数据库
@@ -194,12 +218,14 @@ _过期策略_：定期删除+惰性删除
 
 _内存淘汰机制_：
 
-- `noeviction`: 新写入操作会报错，不用
-- `allkey-lru`: 移除最近最少使用的 key 最常用
-- `allkeys-random`: 随机移除某个 key  不用
-- `volatile-lru`
-- `volatile-random`
-- `volatile-ttl`
+lru：最久未使用法，使用双向链表实现，对于key增改查过的是往链表头部移动
+
+- `no eviction`: 新写入操作会报错，不用    默认
+- `allkey-lru`: 对所有的key使用lru算法
+- `allkeys-random`: 对所有的key随机删除
+- `volatile-lru`：对设置过期时间的key使用lru
+- `volatile-random`：对设置过期时间的key随机删除
+- `volatile-ttl`：对设置过期时间的key中，把最早要删除的删除
 
 ##### 18.数据库和缓存双写不一致
 

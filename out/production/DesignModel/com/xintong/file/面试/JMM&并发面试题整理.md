@@ -102,11 +102,11 @@
 
 jdk1.6为synchronize引入了无锁，偏向锁，轻量级锁、重量级锁
 
-偏向锁：适用于一个线程反复进入同一同步块
+偏向锁01：适用于一个线程反复进入同一同步块
 
-轻量级锁：轻量级锁适用于线程交替执行的场景
+轻量级锁00：轻量级锁适用于线程交替执行的场景
 
-重量级锁：适用于高并发场景
+重量级锁11：适用于高并发场景
 
 **无锁**：初始化没有现成去执行同步块的时候，处于无锁状态
 
@@ -178,7 +178,7 @@ Waiting：调用了无参的wait()、或者调用了join之类的、事实上jio
 
 Timed_Waiting：sleep(long time)、 wait(long time)、 join(long time)
 
-Terminated：死亡状态
+Terminated：死亡状态 /'tɝmə,net/
 
 ##### 12 sleep、wait区别
 
@@ -449,7 +449,7 @@ protected <T> RunnableFuture<T> newTaskFor(Callable<T> callable) {
 
 
 
-##### AQS
+##### 21. 什么是AQS
 
 AQS全称叫做 **AbstractQueuedSynchronizer**  `/kjuː/ /'sɪnkrənaɪzɚ/` 直译过来叫做**抽象队列同步器** ，事实上也确实如此它提供了一个FIFO的队列，而基于AQS实现了juc下很多重要组件，比如ReentrantLock可重入锁、ReentrantReadWriteLock可重入读写锁、Semaphore信号量、CountDownLatch等等的重要组件
 
@@ -461,7 +461,7 @@ CLH队列:基于CLH锁实现的队列
 
 
 
-Semaphore
+##### 22. Semaphore
 
 它的作用是通过acquire和release来对某段代码进行限流限制，也就是说可以去限制同时执行这块代码的线程数量
 
@@ -486,7 +486,7 @@ public static  void active(){
 }
 ```
 
-CountDownLatch
+##### 23. CountDownLatch
 
 主要可以用于控制线程的执行顺序，比如CountDownLatch设置为2次。那么在AB线程中调用countDown，在C线程中调用await，那么C线程会阻塞在await方法处，直到AB线程都执行了countDown之后。
 
@@ -531,3 +531,10 @@ public static void main(String[] args) {
 }
 ```
 
+##### 22. JUC下常见组件
+
+并发容器 ConcurrentHashMap CopyOnWriteArrayList
+
+同步工具 Semaphore CountDownLatch CyclicBarrier
+
+原子变量类 Atomic系列
