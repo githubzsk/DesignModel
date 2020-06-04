@@ -7,9 +7,9 @@ public class Application {
    static Semaphore semaphore = new Semaphore(5);
     public static void main(String[] args) throws InterruptedException {
         semaphore.acquire();
-        semaphore.release();
-        ArticleCenter center = new ArticleCenter(JVMArticle.GETINSTANCE);
-        String message = center.getMessage((int) (Math.random() * JVMArticle.values().length+1));
+        semaphore.release();//
+        ArticleCenter center = new ArticleCenter(DatabaseArticle.GETINSTANCE);
+        String message = center.getMessage((int) (Math.random() * DatabaseArticle.values().length+1));
         System.out.println(message);
         HashMap map = new HashMap();
         map.put("","");

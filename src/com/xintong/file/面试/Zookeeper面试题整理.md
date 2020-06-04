@@ -63,5 +63,12 @@ zookeeper集群有这样一个特性，只要过半机器正常，那zk集群就
 
 watch机制有客户端、服务端、客户端的ZKWatchManage对象协同完成
 
-##### 10 
+##### 10 zookeeper节点的4种状态
+
+- LOOKING：刚启动或者leader挂掉
+- FOLLOWING：选举结束，身份已经定位代follower
+- LEADING：选举结束，身份已经定位到leader
+-  OBSERVING：类似follower，但是不选举不投票
+
+ZAB协议 数据一致性原理
 

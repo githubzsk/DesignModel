@@ -8,7 +8,7 @@ public class Reentranrlock1 {
     public static void main(String[] args) {
         new Thread(() -> test(), "线程1").start();
         new Thread(() -> test(), "线程2").start();
-    }
+    }//
 
     public static void test() {
         try {
