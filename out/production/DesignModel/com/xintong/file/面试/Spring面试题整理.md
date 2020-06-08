@@ -23,6 +23,8 @@ ViewResolver：视图解析器
 
 可以使用Aop把项目里面那些统一的代码比如处理日志，处理异常，提交事务事务回滚什么的统一抽取出来在Aop中实现，代码结构简单，更容易维护，总结起来就是说，Aop可以让我们在不影响原有的功能下，横向的拓展功能
 
+说白话就是吧功能相同的代码抽离出来，在通过理的这种形式把这些代码织入到需要织入的地方，实现功能增强
+
 ##### 4 * Aop使用场景，Aop原理，失效场景
 
 使用场景：日志、处理异常、处理事务
@@ -52,6 +54,17 @@ Aop失效场景
       }
   }
   
+  //解决
+  	@Transactional
+      public void serviceA() {
+          System.out.println("serviceA");
+          //db
+          //获取Aop代理上下文获取当前代理对象，通过代理对象强制代理
+          AService aService = (AService)AopContext.currentProxy();
+          aService.serviceB();
+  
+      }
+  
   ```
 
 
@@ -60,10 +73,12 @@ Aop失效场景
 
 IOC （Inversion  of control）是一种思想，直译过来叫做控制反转，使用IOC的话可以达到控制反转和依赖注入，最终的目标可以实现对象之间的解除对象之间的高度耦合关系，比如说A对象需要B对象，如果不使用IOC容器的话，A对象得自己new，使用了IOC容器，A对象把自己创建B对象的这种控制权交给了IOC容器，让IOC容器帮它去new，然后注入到A对象中，从而实现解耦
 
+IOC本身是一种控制反转的思想，而具体到我们Java 或者说Spring中来说的话，可以理解为Spring的IOC容器，这个容器给我们提供了创建并管理对象的功能，我们不用处理对象之间错综复杂的依赖关系，只需要告诉IOC容器在初始化的时候帮我加载一些我要用的bean，用的时候直接从IOC容器中拿
+
 ##### 6. *注入方式
 
-- 构造函数方法注入 xml中  property 
-- Setter方法注入 xml中 constructor-arg
+- 构造函数方法注入 xml中  constructor-arg
+- Setter方法注入 xml中  property 
 - 接口注入
 - 静态工厂
 - 实例工厂
@@ -202,7 +217,7 @@ jdk动态代理不支持类的代理，必须要你去实现接口
 
 ##### 15. Spring事务实现原理
 
-##### 8 *Spring事务失效原因场景
+##### 16 *Spring事务失效原因场景
 
 1. 使用类
 
@@ -221,7 +236,7 @@ jdk动态代理不支持类的代理，必须要你去实现接口
    - 使用了never
    -  ssm项目 配置 context:component-scan包扫描重复扫描
 
-##### 16. Spring事务的种类
+##### 17. Spring事务的种类
 
 支持声明式事务和编程式事务，更多的时候用于声明式事务使用注解搞定
 
@@ -229,7 +244,7 @@ jdk动态代理不支持类的代理，必须要你去实现接口
 
 编程式事务 优点 可以细粒度到代码块级别，缺点 具有侵入性
 
-##### 17. spring的事务传播行为
+##### 18. spring的事务传播行为
 
 required        required_new 
 
@@ -280,7 +295,7 @@ REPEATABLE_READ(4),//可重复读
 SERIALIZABLE(8);//串行化
 ```
 
-##### 18. Spring支持的几种bean的作用域
+##### 19 Spring支持的几种bean的作用域
 
 使用@Scope()注解配置
 
@@ -290,7 +305,7 @@ SERIALIZABLE(8);//串行化
 4. session 一个会话期间
 5. global-session
 
-##### 18.BeanFactory 和FactoryBean
+##### 20.BeanFactory 和FactoryBean
 
 BeanFactory是bean工厂，在spring中的具体实现是DefaultListableBeanFactory，内部持有了一个ConcurrentHashMap中存了所有的beanDefination
 
@@ -298,7 +313,7 @@ BeanFactory是bean工厂，在spring中的具体实现是DefaultListableBeanFact
 
 FactoryBean具体应用 MyBatis的SQLSessionFactory，但是我们并不需要直接操作它，我们可以通过SqlSessionFactoryBean来获取 SQLSessionFactory，因为他的getObject方法就返回的是SQLSessionFactory
 
-##### 18.BeanFactory和ApplicationContext
+##### 21.BeanFactory和ApplicationContext
 
 BeanFactory可以bean的加载，实例化，维护bean之间的依赖关系等基本功能
 
