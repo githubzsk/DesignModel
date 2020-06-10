@@ -8,13 +8,13 @@ package com.xintong.code.factory2.simple;
  * @Version 1.0
  */
 public class Factory {
-    public static int A = 1;
-    public static int B = 2;
-    public static int C = 3;
+    public static int Message = 1;
+    public static int USB = 2;
+    public static int Inter = 3;
     public static Product getProduct(int type){
-        if (type == A) return new AProduct();
-        if (type == B) return new BProduct();
-        if (type == C) return new CProduct();
+        if (type == Message) return new AProduct();
+        if (type == USB) return new BProduct();
+        if (type == Inter) return new CProduct();
         return null;
     }
 }

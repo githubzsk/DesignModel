@@ -3,7 +3,7 @@ package com.xintong.code.jmm.aqs;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class AQS {
-    private static ReentrantLock lock = new ReentrantLock(true);
+    private static ReentrantLock lock = new ReentrantLock();
     public static void main(String[] args) {
         lock.lock();
         try {

@@ -9,7 +9,7 @@ package com.xintong.code.factory2.simple;
  */
 public class Custom {
     public static void main(String[] args) {
-        Product product = Factory.getProduct(Factory.A);
+        Product product = Factory.getProduct(Factory.USB);
         product.intro();
     }
 }

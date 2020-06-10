@@ -538,3 +538,9 @@ public static void main(String[] args) {
 同步工具 Semaphore CountDownLatch CyclicBarrier
 
 原子变量类 Atomic系列
+
+##### 23.  thread.isInterrupted() Thread.interrupted()区别
+
+Thread.interrupted 调用当前线程的isInterrupted（true）
+
+thread.isInterrupted()调用isInterrupted（false）

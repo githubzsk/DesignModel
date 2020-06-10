@@ -37,14 +37,18 @@
    - _可见性_：是指A线程修改了变量的值，B线程立马就能看到
    - _禁止代码重排序_:我们知道在java代码运行的时候，JIT（Just In Time）即时编译器会起作用，它会优化代码优先执行轻耗代码从而进行代码重排序，它的优化排序并不会影响单线程下的代码逻辑，如果使用了volatile，那么volatile就像一道屏障一样，把volatile之前和之后的代码隔开不会被重排序
 
-2. **原理**
+2. **可见性原理**
 
    volatile修饰的变量在转化为汇编指令的时候会在前面加一个LOCK指令，当CUP执行这个指令的时候会立即做两件事情
 
    1. 把当前内核高速缓存中的数据立即写回主存并锁定缓存区域
    2. 基于MESI协议让其他内核中缓存的数据立即失效
 
-   操作当前内核里面高速缓存中的数据写会主存简单，但是操作其他内核缓存的数据失效就没那么容易，所以这里要借助MESI协议，MESI协议规定了变量的4中状态，M被修改状态 E独占状态 S共享状态 I无效状态，多线程操作被volatile修饰的变量属于共享数据，共享状态意味着时刻被监控，一旦发现共享数据发生改变，立马把共享数据的状态改为I 也就是无效状态，当别的线程去读取这个volatile修饰的数据时候发现他是无效状态，那么它会去主存中重新读取，读取到的则为最新的数据
+   操作当前内核里面高速缓存中的数据写会主存简单，但是操作其他内核缓存的数据失效就没那么容易，所以这里要借助MESI协议，MESI协议规定了缓存变量的4中状态，M被修改状态 E独占状态 S共享状态 I无效状态，多线程操作被volatile修饰的变量属于共享数据，共享状态意味着时刻被监控，一旦发现共享数据发生改变，立马把共享数据的状态改为I 也就是无效状态，当别的线程去读取这个volatile修饰的数据时候发现他是无效状态，那么它会去主存中重新读取，读取到的则为最新的数据
+   
+3. **有序性原理**
+
+   volatile会产生一个叫做StoreLoad的内存屏障指令，排在这个指令之前的代码不能跑到这个指令之后去执行，排在这个指令之后的代码不能跑到指令之前，就保证了有序性
 
 ##### 5. Synchroized锁方法、代码块的区别
 
@@ -451,13 +455,19 @@ protected <T> RunnableFuture<T> newTaskFor(Callable<T> callable) {
 
 ##### 21. 什么是AQS
 
-AQS全称叫做 **AbstractQueuedSynchronizer**  `/kjuː/ /'sɪnkrənaɪzɚ/` 直译过来叫做**抽象队列同步器** ，事实上也确实如此它提供了一个FIFO的队列，而基于AQS实现了juc下很多重要组件，比如ReentrantLock可重入锁、ReentrantReadWriteLock可重入读写锁、Semaphore信号量、CountDownLatch等等的重要组件
+AQS全称叫做 **AbstractQueuedSynchronizer**  `/kjuː/ /'sɪnkrənaɪzɚ/` 直译过来叫做**抽象队列同步器** ，而基于AQS实现了juc下很多重要组件，比如ReentrantLock可重入锁、ReentrantReadWriteLock可重入读写锁、Semaphore信号量、CountDownLatch等等的重要组件
 
 它的实现原理是这样：
 
 AQS这个类中有这么几个重要属性  一个header 一个tail 是Node类型的表示队列头和尾，state
 
-CLH队列:基于CLH锁实现的队列	
+加锁的时候直接使用cas改state，改成功了把自己设置为当前线程，如果失败了就会忘CLH队列里面塞
+
+CLH队列:没抢到锁的线程会被封装成一个个Node节点，塞进CLH队列的尾巴，往进塞的时候它是使用For死循环配合CAS进入的，一旦进入成功，这个线程就会被LockSupport.park的方法把这个线程挂起，
+
+当一个线程释放锁的时候他会去唤醒CLH队列头部的那个节点
+
+
 
 
 
@@ -538,3 +548,26 @@ public static void main(String[] args) {
 同步工具 Semaphore CountDownLatch CyclicBarrier
 
 原子变量类 Atomic系列
+
+##### 23.  thread.isInterrupted() Thread.interrupted()区别
+
+Thread.interrupted 调用当前线程的isInterrupted（true）
+
+thread.isInterrupted()调用isInterrupted（false）
+
+##### 24. 什么是JMM
+
+jmm是Java内存模型，定义了主存以及线程本地私有内存，规定了线程应该如何以及何时能够操作或者访问那些共享变量
+
+##### 25 Atomic系列实现
+
+构造传参进去，赋值给一个被volatile修饰的成员变量value
+
+普通的get/set直接就是对这个value操作，因为他是volatile修饰的，即时可见。
+
+想那些getAndIncrement getAndDecrement getAndAdd 那一系列API基本都是操作Unsafe这个类使用CAS去操作了
+
+##### 26 Semaphore CountDownLatch CyclicBarrier 实现
+
+内部基于一个Sync的一个内部类，而这个Sync这个类继承了AQS，实际上也就等于是基于AQS实现的
+

@@ -14,7 +14,7 @@ public class ThreadPool{
         new Thread(new A()).start();
         C c = new C();
         c.call();
-        ExecutorService executorService = Executors.newWorkStealingPool();
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
 
         ThreadPoolExecutor executor = null;
         executor.submit(new Callable<Integer>() {
