@@ -1,9 +1,7 @@
 package com.xintong.code.strategy.strategy3;
 
 import java.util.HashMap;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Semaphore;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -13,6 +11,7 @@ public class Application {
    static Semaphore semaphore = new Semaphore(5);
    static CountDownLatch latch = new CountDownLatch(3);
    static ReentrantLock lock = new ReentrantLock();
+   static CyclicBarrier barrier = new CyclicBarrier(5);
     public static void main(String[] args) throws InterruptedException {
         lock.lock();
         lock.unlock();
@@ -20,6 +19,11 @@ public class Application {
         latch.await();
         semaphore.acquire();
         semaphore.release();//
+        try {
+            barrier.await();
+        } catch (BrokenBarrierException e) {
+            e.printStackTrace();
+        }
         AtomicInteger integer = new AtomicInteger(10);
         AtomicBoolean atomicBoolean = new AtomicBoolean(false);
         AtomicLong atomicLong = new AtomicLong(5l);

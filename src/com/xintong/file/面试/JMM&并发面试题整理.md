@@ -571,3 +571,5 @@ jmm是Java内存模型，定义了主存以及线程本地私有内存，规定�
 
 内部基于一个Sync的一个内部类，而这个Sync这个类继承了AQS，实际上也就等于是基于AQS实现的
 
+- Semaphore ：内部创建了一个非公平锁，继承自Sync这个类，而这个类有继承自AQS，实际上他的构造参数传进去是传给了AQS的state，然后调用acquire一次，他会使用cas这个state-1，你release一次，他会给这个state+1，如果这个acquire方法执行减到0的时候，这时候再来线程执行acquire，它一看state等于0了说明已经被别的线程占完了，那么它会通过for+cas的形式塞进CLH队列中去挂起等待
+- CountDownLatch ：构造参数传进去的那个值，实际上赋给了AQS的state，调用countDown实际上就是通过cas state-1，调用await的内部实际上会把调用的当前线程通过AQS的那个LockSupport.park方法挂起，直到调用countDown一直把state减到0，这个时候会把调用await方法的那个线程唤醒，这就是他的实现原理
