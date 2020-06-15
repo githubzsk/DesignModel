@@ -12,7 +12,10 @@ public class Application {
    static CountDownLatch latch = new CountDownLatch(3);
    static ReentrantLock lock = new ReentrantLock();
    static CyclicBarrier barrier = new CyclicBarrier(5);
+   static ThreadLocal local = new ThreadLocal();
     public static void main(String[] args) throws InterruptedException {
+        local.set(new Object());
+        local.get();
         lock.lock();
         lock.unlock();
         latch.countDown();
