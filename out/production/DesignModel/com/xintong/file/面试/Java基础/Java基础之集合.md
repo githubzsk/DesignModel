@@ -269,20 +269,25 @@ final Node<K,V>[] resize() {
         Node<K,V>[] newTab = (Node<K,V>[])new Node[newCap];
     table = newTab;
     if (oldTab != null) {
+        //开始遍历数组
         for (int j = 0; j < oldCap; ++j) {
             Node<K,V> e;
             if ((e = oldTab[j]) != null) {
                 oldTab[j] = null;
                 if (e.next == null)
+                    //如果只有一个元素好办，直接计算迁移就行了
                     newTab[e.hash & (newCap - 1)] = e;
                 else if (e instanceof TreeNode)
+                    //如果是红黑树的话，按照红黑树的方式重新计算
                     ((TreeNode<K,V>)e).split(this, newTab, j, oldCap);
                 else { // preserve order
+                    //如果是链表的话，他会把原来的链表拆成两段
                     Node<K,V> loHead = null, loTail = null;
                     Node<K,V> hiHead = null, hiTail = null;
                     Node<K,V> next;
                     do {
                         next = e.next;
+                        //如果是&操作等于0就放在原来的位置上
                         if ((e.hash & oldCap) == 0) {
                             if (loTail == null)
                                 loHead = e;
@@ -290,6 +295,7 @@ final Node<K,V>[] resize() {
                                 loTail.next = e;
                             loTail = e;
                         }
+                        //不然的话就放在原来的位置+原来的容量的那个新位置上
                         else {
                             if (hiTail == null)
                                 hiHead = e;

@@ -21,6 +21,7 @@ public class CountDownLatchDemo {
                 System.out.println("1号客人入场，正在入座....");
                 try {
                     Thread.sleep(1000);
+                    System.out.println("1号客人入场，等待上菜");
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -33,6 +34,7 @@ public class CountDownLatchDemo {
                 System.out.println("2号客人入场，正在入座....");
                 try {
                     Thread.sleep(2000);
+                    System.out.println("2号客人入场，等待上菜");
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -45,12 +47,14 @@ public class CountDownLatchDemo {
                 System.out.println("3号客人入场，正在入座....");
                 try {
                     Thread.sleep(3000);
+                    System.out.println("3号客人入场，等待上菜");
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 countDownLatch.countDown();
             }
         });
+        executor.shutdown();
 
     }
 
