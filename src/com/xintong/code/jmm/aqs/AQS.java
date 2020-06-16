@@ -1,9 +1,11 @@
 package com.xintong.code.jmm.aqs;
 
+import org.omg.CORBA.TRANSACTION_UNAVAILABLE;
+
 import java.util.concurrent.locks.ReentrantLock;
 
 public class AQS {
-    private static ReentrantLock lock = new ReentrantLock();
+    private static ReentrantLock lock = new ReentrantLock(true);
     public static void main(String[] args) {
         lock.lock();
         try {

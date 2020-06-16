@@ -480,7 +480,7 @@ private static Semaphore semaphore =  new Semaphore(3);
 public static  void active(){
     try {
         semaphore.acquire();
-        System.out.println("线程 "+Thread.currentThread().getName()+"进入 ");
+        System.out.println("线程 "+Thread.currentThread().getName()+"进入");
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
