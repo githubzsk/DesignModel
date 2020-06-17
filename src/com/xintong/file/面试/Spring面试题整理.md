@@ -21,7 +21,7 @@ ViewResolver：视图解析器
 
 
 
-SpringMVC的核心是DispatchServlet，
+SpringMVC的核心是DispatchServlet，既然是一个Servlet
 
 ##### 3 *Aop解决了什么问题
 
