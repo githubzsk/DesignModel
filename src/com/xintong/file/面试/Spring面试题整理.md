@@ -21,7 +21,24 @@ ViewResolver：视图解析器
 
 
 
-SpringMVC的核心是DispatchServlet，既然是一个Servlet
+SpringMVC的核心是DispatchServlet，既然是一个Servlet，那么他必然有init方法以及service方法，事实上他的核心流程就他的service方法里面处理的，但是在说service的核心流程之前，我觉得我有必要说一下他的init方法，因为他的init方法初始化了一些核心流程所需要的数据
+
+实际上DispatcherServlet这个类中直接重写init方法，是在他的某一层父类中种重写的init，但是父类中的init方法经过一系列的调用，调用到了DispatcherServlet中的一个init开头的一个方法，这个方法完成了DispatcherServlet的初始化，初始化的内容很多，这里我只说重点，	比如说
+
+```java
+//初始化handlerMapping处理器映射器
+initHandlerMappings(context);
+//初始化handlerAdaptcher参数适配器
+initHandlerAdapters(context);
+//初始化viewResolvers视图转换器
+initViewResolvers(context);
+```
+
+初始化它主要就干这些事情
+
+初始化完成之后，当来了Http请求的时候，便执行他的service方法，service方法的核心是一个叫做doDispatch的方法，具体请求流程他是这里开始
+
+根据request请求解析出url地址，然后调用handlerMapping寻找对应的的handler，实际上HandlerMapping维护了一个Map，准确的来说是一个LinkedHashMap，key是url，value是Controller的beanName，
 
 ##### 3 *Aop解决了什么问题
 
