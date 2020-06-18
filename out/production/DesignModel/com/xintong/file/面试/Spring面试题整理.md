@@ -6,18 +6,31 @@ Spring中的事务事实上也就是对数据库的事务操作，当然Spring�
 
 ##### 2 *SpringMVC的请求全流程
 
-DispatchServlet：前端控制器也叫调度器
+SpringMVC的核心是DispatchServlet，既然是一个Servlet，那么他必然有init方法以及service方法，事实上他的核心流程就他的service方法里面处理的，但是在说service的核心流程之前，我觉得我有必要说一下他的init方法，因为他的init方法初始化了一些核心流程所需要的数据
 
-HandlerMapping：处理器映射器
+实际上DispatcherServlet这个类中直接重写init方法，是在他的某一层父类中种重写的init，但是父类中的init方法经过一系列的调用，调用到了DispatcherServlet中的一个init开头的一个方法，这个方法完成了DispatcherServlet的初始化，初始化的内容很多，这里我只说重点，	比如说
 
-HandlerAdapter: 处理器适配器
+```java
+//初始化handlerMapping处理器映射器
+initHandlerMappings(context);
+//初始化handlerAdaptcher参数适配器
+initHandlerAdapters(context);
+//初始化viewResolvers视图转换器
+initViewResolvers(context);
+```
 
-ViewResolver：视图解析器
+初始化它主要就干这些事情
 
-1. 请求发送到DispatchServlet，前端控制器会调用处理器映射器对你这个url进行解析，并返回给前端控制器一个处理器hander，说白点这个就是找对应的Controller
-2. 然后前端控制器，会调用处理器适配器去执行这个处理器handler，完了之后返回ModelAndView，说白了就是寻找我们Controller层的对应方法并执行业务再返回数据
-3. 接下来前端控制器在调用视图解析去处理这个ModelAndView，处理完之后返回一个试图对象
-4. 接下来对这个视图进行渲染之后，再由前端控制器返回给页面
+初始化完成之后，当来了Http请求的时候，便执行他的service方法，service方法的核心是一个叫做doDispatch的方法，具体请求流程他是这里开始
+
+1. 通过request请求中解析出url，然后通过url在Handlermapping中寻找对于的Controller，在源码层面叫做handle处理器，实际上在HandlerMapping中用一个map来保存了url与controller的对应关系，具体来说是LinkedHashMap，然后将handle封装成一个HandlerExecutionChain处理器执行链返回，注意这里并没有直接返回一个处理器
+2. 拿到这个HandleExecutionChain之后会进行判断，如果说你这个执行链为空，也就是没找到对应处理器，那么他直接return，说白了就是就是我们常见的404，如果不为空，那么继续往下走
+3. 他会从HandlerExecutionChain中拿出handle，调用特定的方法寻找一个合适的处理器适配器，注意我说这里只是寻找出来，并没有使用HandleAdapter去执行。
+4. 我们都知道，mvc中有拦截器，拦截器中有前置处理器后置处理器，接下来就是我们写的拦截器的前置处理器作用的时候了，如果不符合，在这里直接return掉，如果符合，继续往下走
+5. 这个时候调用处理器适配器HandleAdapter去处理HandlerExecutionChain中的handle，处理完成之后会返回一个ModelAndView
+6. 接着调用拦截器的后置处理器的业务逻辑可能会对ModelAndView进行处理
+7. 然后在调用ViewResolver对ModelAndView进行处理，处理完成之后返回一个View
+8. 接下来就是对这个View进行渲染以及进行response
 
 ##### 3 *Aop解决了什么问题
 

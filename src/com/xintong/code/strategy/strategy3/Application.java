@@ -18,20 +18,20 @@ public class Application {
         local.get();
         lock.lock();
         lock.unlock();
-        latch.countDown();
-        latch.await();
+//        latch.countDown();
+//        latch.await();
         semaphore.acquire();
         semaphore.release();//
-        try {
-            barrier.await();
-        } catch (BrokenBarrierException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            barrier.await();
+//        } catch (BrokenBarrierException e) {
+//            e.printStackTrace();
+//        }
         AtomicInteger integer = new AtomicInteger(10);
         AtomicBoolean atomicBoolean = new AtomicBoolean(false);
         AtomicLong atomicLong = new AtomicLong(5l);
-        ArticleCenter center = new ArticleCenter(JVMArticle.GETINSTANCE);
-        String message = center.getMessage((int) (Math.random() * JVMArticle.values().length+1));
+        ArticleCenter center = new ArticleCenter(DatabaseArticle.GETINSTANCE);
+        String message = center.getMessage((int) (Math.random() * DatabaseArticle.values().length+1));
         System.out.println(message);
         HashMap map = new HashMap();
         map.put("","");
