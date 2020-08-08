@@ -30,8 +30,8 @@ public class Application {
         AtomicInteger integer = new AtomicInteger(10);
         AtomicBoolean atomicBoolean = new AtomicBoolean(false);
         AtomicLong atomicLong = new AtomicLong(5l);
-        ArticleCenter center = new ArticleCenter(DatabaseArticle.GETINSTANCE);
-        String message = center.getMessage((int) (Math.random() * DatabaseArticle.values().length+1));
+        ArticleCenter center = new ArticleCenter(JVMArticle.GETINSTANCE);
+        String message = center.getMessage((int) (Math.random() * JVMArticle.values().length+1));
         System.out.println(message);
         HashMap map = new HashMap();
         map.put("","");
