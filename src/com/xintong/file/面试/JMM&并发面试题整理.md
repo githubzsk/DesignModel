@@ -425,7 +425,7 @@ ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(
 
 ##### 20 execute和submit的区别
 
-最主要的区别是execute没有返回值自能传Runnable，而submit有返回值可以穿Runnable和Callable，事实上给submit传一个Runnable在内部也会转化成Callable
+最主要的区别是execute没有返回值只能传Runnable，而submit有返回值可以穿Runnable和Callable，事实上给submit传一个Runnable在内部也会转化成Callable
 
 另外一个区别execute在执行的过程中如果有异常的话会抛出来，而submit不会抛出异常除非调用get()
 
@@ -580,3 +580,6 @@ ThreadLocal本身只是一个桥梁作用，通过ThreadLocal实际上操作的�
 
 因为ThreadLocalMap是一个数组，也就意味着能存多个ThreadLocal对应的键值对，也就意味着可以使用多个ThreadLocal给一个Thread携带上多个变量副本，因为一个ThreadLocal值能set一个变量副本，但是这种操作不够优雅。如果想设置多个的话，一般搞一个HashMap，把多个变量塞到Map里，把Map在通过ThreadLocal这个桥梁在塞到Thread本身携带的那个ThreadLocalMap里就OK
 
+##### 28.什么是JMM
+
+JMM规范规定了一个线程如何以及何时可以看到由其他线程修改过后的共享变量的值，以及在必要的时候如何同步的访问共享变量
