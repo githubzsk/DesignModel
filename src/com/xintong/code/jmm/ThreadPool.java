@@ -2,33 +2,36 @@ package com.xintong.code.jmm;
 
 import com.xintong.code.proxy.proxy3.Run;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.*;
+import java.util.concurrent.locks.AbstractQueuedSynchronizer;
 
 public class ThreadPool{
+
+    private static AbstractQueuedSynchronizer aqs;
     public static void main(String[] args) throws Exception {
-        B b = new B();
-        b.start();
-        new Thread(new A()).start();
-        C c = new C();
-        c.call();
+//        B b = new B();
+//        b.start();
+//        new Thread(new A()).start();
+//        C c = new C();
+//        c.call();
         ExecutorService executorService = Executors.newFixedThreadPool(10);
 
         ThreadPoolExecutor executor = null;
-        executor.submit(new Callable<Integer>() {
+        Future<Integer> future = executorService.submit(new Callable<Integer>() {
             @Override
             public Integer call() throws Exception {
-                return null;
-            }
-        });
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
+                throw new RuntimeException();
 
             }
         });
+        future.get();
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                throw new RuntimeException();
+            }
+        });
+        executorService.shutdown();
     }
 
 }
