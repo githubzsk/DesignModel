@@ -61,9 +61,14 @@ redis支持五种数据结构 string (字符串)、list (列表)、set (集合)�
 
 3. ***AOF重写***：随着aof文件不断增大，为了减少无用数据，所以需要aof重写
 
+   - auto-aof-rewrite-percentage 100
+   - auto-aof-rewrite-min-size 64mb
+
+   　　这两个配置项的意思是，在aof文件体量超过64mb，且比上次重写后的体量增加了100%时自动触发重写。我们可以修改这些参数达到自己的实际要求
+
    ***重写原理***：①创建一个子线程②基于当前内存快照把新的aof写到一个临时文件里，③同时主线程继续把新的变动写进原来的aof中④主线程获取子线程重写完成的信号，把新的增量写到新的aof中⑤ 替换旧的aof
 
-4. ***混合持久化***：以bgsave做全量持久化、aof做增量持久化，生成的文件叫做aof，集成了rdb的文件小、速度快、和aof的数据完整特点
+4. ***混合持久化***：redis4.0，以rdb做全量持久化、aof做增量持久化，生成的文件叫做aof，文件的前半段是rdb，后半段是aof，集成了rdb的文件小、速度快、和aof的数据完整特点
 
 5. ***数据恢复***：去看aof存在不存在。如果aof存在的话加载aof忽略rdb
 
@@ -131,7 +136,7 @@ Sentinel集群正常运行期间，每个Sentinel实例事实上是平等的，�
    - 带上自己的epoch让别的Sentinel节点为自己投票
    - 投自己一票
 3. 如果其他Sentinel给Candidate投了票，那么其他Sentinel在本轮中就是Follower
-4. Candidate会不断统计自己票数，在超时时间内，如果一旦自己的票数过半切超过quorum(法定人数)，那么这个Candidate就转变为Leader
+4. Candidate会不断统计自己票数，在超时时间内，如果一旦自己的票数过半且超过quorum(法定人数)，那么这个Candidate就转变为Leader
 5. 如果一旦超时，那么便进行下一轮选举，直至选出Leader
 
 ##### 14. Redis有哪些架构模式及其特点？
@@ -228,7 +233,7 @@ _过期策略_：定期删除+惰性删除
 
 _内存淘汰机制_：
 
-lru：最久未使用法，使用双向链表实现，对于key增改查过的是往链表头部移动
+lru：Least Recently Used,最久未使用法，使用双向链表实现，对于key增改查过的是往链表头部移动
 
 - `no eviction`: 新写入操作会报错，不用    默认
 - `allkey-lru`: 对所有的key使用lru算法

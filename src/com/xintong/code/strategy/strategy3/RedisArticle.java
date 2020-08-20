@@ -16,13 +16,13 @@ public enum RedisArticle implements Article {
     ITEM12(12,"12哨兵之间Leader选举机制"),//1
     ITEM13(13,"13哨兵如何选一个Slave作为新的Master"),//1
     ITEM14(14,"14Redis有哪些架构模式及其特点？"),//1
-    ITEM15(15,"15缓存穿透、缓存击穿、缓存雪崩及其解决方案"),
+    ITEM15(15,"15缓存穿透、缓存击穿、缓存雪崩及其解决方案"),//1
     ITEM16(16,"16布隆过滤器"),//1
     ITEM17(17,"17Redis过期策略？内存淘汰机制？"),//1
-    ITEM18(18,"18数据库和缓存双写不一致"),
-    ITEM19(19,"19Redis实现分布式锁"),//1
-    ITEM20(20,"20Redis并发竞争问题"),//1
-    ITEM21(21,"21Redis主从原理");//1
+    ITEM18(18,"18数据库和缓存双写不一致"),//1
+    ITEM19(19,"19Redis实现分布式锁"),
+    ITEM20(20,"20Redis并发竞争问题"),
+    ITEM21(21,"21Redis主从原理");
     RedisArticle(int id,String name){
         this.id = id;
         this.name = name;
