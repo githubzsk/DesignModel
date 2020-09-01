@@ -82,7 +82,8 @@ Aop失效场景
   
   ```
 
-
+- Spring父容器对应的是@Service层以下的Bean，SpringMVC子容器对应的是@Controller的Bean，子可以访问父但是父容器不能访问子，如果在Spring的配置文件中配置了切点表达式是Controller的方法，那是没办法代理的，解决的方法就是配置到SpringMVC的配置文件中
+- 重复扫描的问题，Spring和SpringMVC都扫描了一遍，实际上就相当于SpringMVC子容器中的bean最后覆盖了Spring容器中的代理bean，也会失效，不要重复扫描
 
 ##### 5. IOC是什么
 

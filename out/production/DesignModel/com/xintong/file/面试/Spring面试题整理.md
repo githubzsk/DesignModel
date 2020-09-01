@@ -34,7 +34,9 @@ initViewResolvers(context);
 
 ##### 3 *Aop解决了什么问题
 
-可以使用Aop把项目里面那些统一的代码比如处理日志，处理异常，提交事务事务回滚什么的统一抽取出来在Aop中实现，代码结构简单，更容易维护，总结起来就是说，Aop可以让我们在不影响原有的功能下，横向的拓展功能
+可以使用Aop把项目里面那些统一的代码比如处理日志，处理异常，提交事务事务回滚什么的统一抽取出来在Aop中实现，代码结构简单，更容易维护，
+
+// 总结起来就是说，Aop可以让我们在不影响原有的功能下，横向的拓展功能
 
 说白话就是吧功能相同的代码抽离出来，在通过理的这种形式把这些代码织入到需要织入的地方，实现功能增强
 
@@ -84,8 +86,6 @@ Aop失效场景
 
 ##### 5. IOC是什么
 
-IOC （Inversion  of control）是一种思想，直译过来叫做控制反转，使用IOC的话可以达到控制反转和依赖注入，最终的目标可以实现对象之间的解除对象之间的高度耦合关系，比如说A对象需要B对象，如果不使用IOC容器的话，A对象得自己new，使用了IOC容器，A对象把自己创建B对象的这种控制权交给了IOC容器，让IOC容器帮它去new，然后注入到A对象中，从而实现解耦
-
 IOC本身是一种控制反转的思想，而具体到我们Java 或者说Spring中来说的话，可以理解为Spring的IOC容器，这个容器给我们提供了创建并管理对象的功能，我们不用处理对象之间错综复杂的依赖关系，只需要告诉IOC容器在初始化的时候帮我加载一些我要用的bean，用的时候直接从IOC容器中拿
 
 ##### 6. *注入方式
@@ -128,7 +128,7 @@ Inject（javaee）默认按照byType
 3. 赋完值之后进行初始化，初始化的对应方法叫做initializeBean，也在这个doCreateBean方法内部，而这个初始化话中细分的话步骤还是比较多的
 
    - ```java
-     //如果实现了Aware系列接口，首先他会处理这些
+     //如果实现了Aware系列接口，首先他会处理这些 BeanNameAware BeanFactoryAware MessageResourceAware 等等
      if (System.getSecurityManager() != null) {
      			AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
      				invokeAwareMethods(beanName, bean);

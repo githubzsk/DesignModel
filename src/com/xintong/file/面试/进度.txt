@@ -5,3 +5,17 @@ JPA 19
 复习 21 - 22
 
 springcloud项目相关  chm aqs
+
+DB√
+JMM√
+JVM√
+Redis√
+Spring√
+Zookeeper√
+Distribute
+Dubbo
+Base
+MQ
+Mybatis
+SpringBoot
+Springcloud
