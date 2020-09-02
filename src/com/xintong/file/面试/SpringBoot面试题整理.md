@@ -28,7 +28,7 @@ ComponentScan这个就不展开讲了，做ssm时候经常配扫描范围
 
 **原理**：对于标注了Configuration的类，Spring会基于CGLib对这个类进行动态代理进行增强  ConfigurationClassPostProcessor
 
-**源码**：这里涉及到一个知识点BeanFactoryPostProcessor，BeanFactoryPostProcessor可以拿到BeanFactory在Bean初始化之前对bean的属性进行修改，处理的类实现了BeanFactoryPostProcessor，然后对BeanDefination进行遍历，找到所有标注Configruation的类，然后对这些类使用CGLib进行动态代理对它的方法进行增强，而增强的依据就是看你对应 的方法有没有标注@Bean注解，如果标注了他就给你把该方法的返回值Bean注入到IOC容器里面去
+**源码**：这里涉及到一个知识点BeanFactoryPostProcessor，BeanFactoryPostProcessor可以拿到BeanFactory在Bean实例化之前对bean的属性进行修改，处理的类实现了BeanFactoryPostProcessor，然后对BeanDefination进行遍历，找到所有标注Configruation的类，然后对这些类使用CGLib进行动态代理对它的方法进行增强，而增强的依据就是看你对应 的方法有没有标注@Bean注解，如果标注了他就给你把该方法的返回值Bean注入到IOC容器里面去
 
 ##### 5 EnableAutoConfiguration注解
 
@@ -54,7 +54,7 @@ ComponentScan这个就不展开讲了，做ssm时候经常配扫描范围
 
 ##### 6 BeanFactoryPostProcessor和BeanPostProcessor
 
-BeanFactoryPostProcessor可以拿到BeanFactory在Bean初始化之前对bean的属性进行修改
+BeanFactoryPostProcessor可以拿到BeanFactory在Bean实例化之前对bean的属性进行修改
 
 BeanPostProcessor在Bean初始化之后对bean进行修改
 
