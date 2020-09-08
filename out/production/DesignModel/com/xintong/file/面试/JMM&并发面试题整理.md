@@ -373,7 +373,7 @@ ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
 ExecutorService fixedThreadPool = Executors.newFixedThreadPool(23);
 //单线程池
 ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
-//定长线程池
+//定时线程池
 ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(12);
 ```
 

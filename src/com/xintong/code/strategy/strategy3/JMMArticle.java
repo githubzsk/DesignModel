@@ -18,7 +18,7 @@ public enum JMMArticle implements Article {
     ITEM14(14,"14线程池原理 核心参数？"),//1
     ITEM15(15,"15线程池线程复用原理"),//1
     ITEM16(16,"16四种线程池区别"),//1
-    ITEM17(17,"17线程池使用的队列"),
+    ITEM17(17,"17线程池使用的队列"),//1
     ITEM18(18,"18线程池拒绝策略"),//1
     ITEM19(19,"19execute和submit的区别"),//1
     ITEM20(20,"20submit实现原理"),//1
@@ -27,9 +27,9 @@ public enum JMMArticle implements Article {
     ITEM23(23,"23CountDownLatch"),//1
     ITEM24(24,"24什么是JMM"),//1
     ITEM25(25,"25Atomic系列实现"),//1
-    ITEM26(26,"26Semaphore/CountDownLatch实现"),
+    ITEM26(26,"26Semaphore/CountDownLatch实现"),//1
     ITEM27(27,"27ThreadLocal实现原理"),//1
-    ITEM28(28,"28为什么要用线程池");//1
+    ITEM28(28,"28为什么要用线程池");
     JMMArticle(int id,String name){
         this.id = id;
         this.name = name;
