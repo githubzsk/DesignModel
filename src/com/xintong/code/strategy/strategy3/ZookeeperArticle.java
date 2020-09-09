@@ -2,11 +2,11 @@ package com.xintong.code.strategy.strategy3;
 
 public enum  ZookeeperArticle implements Article {
     GETINSTANCE(0,""),
-    ITEM1(1,"1 说说你对zookeeper的理解?"),
+    ITEM1(1,"1 说说你对zookeeper的理解?"),//1
     ITEM2(2,"2 为什么zookeeper能作为注册中心"),//1
-    ITEM3(3,"3 zookeeper节点类型"),
-    ITEM4(4,"4 zookeeper临时节点实现原理"),
-    ITEM5(5,"5 zookeeper角色"),
+    ITEM3(3,"3 zookeeper节点类型"),//1
+    ITEM4(4,"4 zookeeper临时节点实现原理"),//1
+    ITEM5(5,"5 zookeeper角色"),//1
     ITEM6(6,"6 Leader选举"),//1
     ITEM7(7,"7 zookeeper集群为什么要搭建奇数台"),//1
     ITEM8(8,"8 Zookeeper的Watch机制原理"),
