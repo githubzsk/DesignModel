@@ -9,10 +9,10 @@ public enum  ZookeeperArticle implements Article {
     ITEM5(5,"5 zookeeper角色"),//1
     ITEM6(6,"6 Leader选举"),//1
     ITEM7(7,"7 zookeeper集群为什么要搭建奇数台"),//1
-    ITEM8(8,"8 Zookeeper的Watch机制原理"),
-    ITEM9(9,"9 zookeeper节点的4种状态"),
+    ITEM8(8,"8 Zookeeper的Watch机制原理"),//1
+    ITEM9(9,"9 zookeeper节点的4种状态"),//1
     ITEM10(10,"10 ZAB协议"),//1
-    ITEM11(11,"11 数据一致性原理"),
+    ITEM11(11,"11 数据一致性原理"),//1
     ITEM12(12,"12 事务ID zxid"),//1
     ITEM13(13,"13 数据同步");//1
     ZookeeperArticle(int id,String name){
