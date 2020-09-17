@@ -1,5 +1,7 @@
 package com.xintong.code.strategy.strategy3;
 
+import java.util.concurrent.ArrayBlockingQueue;
+
 public enum JMMArticle implements Article {
     GETINSTANCE(0,""),
     ITEM1(1,"1什么是线程？线程和进程的区别"),//1
@@ -29,7 +31,7 @@ public enum JMMArticle implements Article {
     ITEM25(25,"25Atomic系列实现"),//1
     ITEM26(26,"26Semaphore/CountDownLatch实现"),//1
     ITEM27(27,"27ThreadLocal实现原理"),//1
-    ITEM28(28,"28为什么要用线程池");
+    ITEM28(28,"28为什么要用线程池");//1
     JMMArticle(int id,String name){
         this.id = id;
         this.name = name;

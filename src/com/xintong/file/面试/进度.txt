@@ -19,3 +19,10 @@ Springcloud
 Dubbo
 Base
 MQ
+
+自我介绍，做过总共项目
+SpringCloud使用
+kafka使用
+项目细节
+设计模式
+红黑树√

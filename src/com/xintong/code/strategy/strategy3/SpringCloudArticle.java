@@ -17,12 +17,6 @@ public enum SpringCloudArticle implements Article {
     ITEM13(13,"13 SpringCloud和Dubbo区别"),//
     ITEM14(14,"14 Ribbon负载均衡策略"),//
     ITEM15(15,"15 服务扇出");//
-//    ITEM16(16,"16 数据库乐观锁悲观锁有用过吗，实现？"),
-//    ITEM17(17,"17 行锁跟表锁区别 "),//1
-//    ITEM18(18,"18 为什么用B+树，不用其他类型"),//1
-//    ITEM19(19,"19 MyiSAM和innodb区别"),//1
-//    ITEM20(20,"20 磁盘读取原理"),//
-//    ITEM21(20,"21 left join，right join，inner join");
     SpringCloudArticle(int id,String name){
         this.id = id;
         this.name = name;

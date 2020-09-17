@@ -15,6 +15,7 @@ public final class PlayGame {
         System.out.println("加速器...");
         //开始游戏
         game.play();//
+
         System.out.println("存档...");
     }
     public static void main(String[] args){

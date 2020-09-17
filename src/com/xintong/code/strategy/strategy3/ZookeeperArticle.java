@@ -14,7 +14,7 @@ public enum  ZookeeperArticle implements Article {
     ITEM10(10,"10 ZAB协议"),//1
     ITEM11(11,"11 数据一致性原理"),//1
     ITEM12(12,"12 事务ID zxid"),//1
-    ITEM13(13,"13 数据同步");//1
+    ITEM13(13,"13 数据同步");//
     ZookeeperArticle(int id,String name){
         this.id = id;
         this.name = name;

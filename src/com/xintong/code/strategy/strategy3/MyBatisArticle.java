@@ -5,7 +5,7 @@ public enum MyBatisArticle implements Article {
     ITEM1(1,"#{}和${}的区别是什么"),//1
     ITEM2(2,"MyBatis和Jpa/Hibernate/Spring data jpa的区别"),//1
     ITEM3(3,"Mybatis 中一级缓存与二级缓存的区别？"),//1
-    ITEM4(4,"MyBatis动态sql执行原理"),//1
+    ITEM4(4,"MyBatis动态sql执行原理"),
     ITEM5(5,"MyBatis分页"),//1
     ITEM6(6,"当实体类中的属性名和表中的字段名不一样，如果将查询的结果封装到指定pojo"),//1
     ITEM7(7,"在mapper中如何传递多个参数？"),//1

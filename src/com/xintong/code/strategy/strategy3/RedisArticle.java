@@ -22,7 +22,7 @@ public enum RedisArticle implements Article {
     ITEM18(18,"18数据库和缓存双写不一致"),//1
     ITEM19(19,"19Redis实现分布式锁"),//1
     ITEM20(20,"20Redis并发竞争问题"),//1
-    ITEM21(21,"21Redis主从原理");//1
+    ITEM21(21,"21Redis主从原理");//11
     RedisArticle(int id,String name){
         this.id = id;
         this.name = name;
