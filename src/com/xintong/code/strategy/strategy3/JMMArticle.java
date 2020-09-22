@@ -12,7 +12,7 @@ public enum JMMArticle implements Article {
     ITEM6(6,"6synchronized为什么叫重量级锁"),//1
     ITEM7(7,"7Synchroized锁升级过程"),//1
     ITEM8(8,"8介绍CAS"),//1
-    ITEM9(9,"9自旋锁"),//1
+    ITEM9(9,"9自旋锁"),
     ITEM10(10,"10线程状态"),//1
     ITEM11(11,"11sleep、wait区别"),//1
     ITEM12(12,"12为什么wait在Object中"),//1
@@ -29,7 +29,7 @@ public enum JMMArticle implements Article {
     ITEM23(23,"23CountDownLatch"),//1
     ITEM24(24,"24什么是JMM"),//1
     ITEM25(25,"25Atomic系列实现"),//1
-    ITEM26(26,"26Semaphore/CountDownLatch实现"),//1
+    ITEM26(26,"26Semaphore/CountDownLatch实现"),
     ITEM27(27,"27ThreadLocal实现原理"),//1
     ITEM28(28,"28为什么要用线程池");//1
     JMMArticle(int id,String name){

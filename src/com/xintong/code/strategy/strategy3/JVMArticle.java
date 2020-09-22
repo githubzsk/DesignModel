@@ -28,7 +28,7 @@ public enum JVMArticle implements Article {
     ITEM23(23,"什么是双亲委派模型"),//1
     ITEM24(24,"为什么使用双亲委派模型？"),//1
     ITEM25(25,"打破双亲委派模型"),//1
-    ITEM26(26,"什么是SPI机制");//
+    ITEM26(26,"什么是SPI机制");//1
     JVMArticle(int id,String name){
         this.id = id;
         this.name = name;

@@ -392,7 +392,13 @@ SPI全称Service Provider Interface，是Java提供给第三方实现或者扩�
 
 ##### 27. 等待补充.....  逃逸分析.栈上分配.指针压缩
 
+##### 28.JDK8的默认垃圾收集器
 
+在1.7的早起版本中是Parallel scavenge + Serial old
+
+后来1.7一次小的版本发布 更新成了Parallel scavenge + Parallel old
+
+一直到8 都是Parallel scavenge + Parallel old
 
 
 

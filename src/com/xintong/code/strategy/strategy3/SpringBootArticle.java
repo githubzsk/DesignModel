@@ -7,7 +7,7 @@ public enum SpringBootArticle implements Article {
     ITEM3(3,"3 @SpringBootApplication注解干了些啥?"),//1
     ITEM4(4,"4 @Configuration注解"),//1
     ITEM5(5,"5 @EnableAutoConfiguration注解"),//1
-    ITEM6(6,"6 BeanFactoryPostProcessor和BeanPostProcessor");//1
+    ITEM6(6,"6 BeanFactoryPostProcessor和BeanPostProcessor");//
     SpringBootArticle(int id,String name){
         this.id = id;
         this.name = name;

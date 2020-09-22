@@ -64,6 +64,12 @@ MyBatis可以使用RowBounds对象分页，也可以使用pagehelper，也可以
 
 是基于JDK的动态代理创建出一个代理的实现类去操作的。
 
+##### 12.Mybaits常用标签
 
+- 基本 增删改查 insert delete update select
+- 动态sql   if  foreach choose
+- 关联关系  collection association
+- 封装结果 resultmap
+- 常量定义 sql  incloud
 
  

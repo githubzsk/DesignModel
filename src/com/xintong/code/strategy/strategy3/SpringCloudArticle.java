@@ -7,9 +7,9 @@ public enum SpringCloudArticle implements Article {
     ITEM3(3,"3 Eureka"),//1
     ITEM4(4,"4 EurekaServer缓存机制"),//
     ITEM5(5,"5 注册表"),//
-    ITEM6(6,"6 Eureka高可用原理"),//1
+    ITEM6(6,"6 Eureka高可用原理"),//
     ITEM7(7,"7 Eureka AP原理"),//
-    ITEM8(8,"8 Eureka服务注册原理"),//1
+    ITEM8(8,"8 Eureka服务注册原理"),//
     ITEM9(9,"9 eureka和zookeeper作为注册中心的区别"),//
     ITEM10(10,"10 Eureka自我保护机制"),//
     ITEM11(11,"11 主要组件以及如何运用"),//
