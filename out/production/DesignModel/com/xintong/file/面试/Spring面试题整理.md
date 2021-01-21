@@ -229,6 +229,10 @@ jdk动态代理不支持类的代理，必须要你去实现接口
 
 （4）模板方法：用来解决代码重复的问题。比如. RestTemplate, JmsTemplate, JpaTemplate。
 
+（5）适配器模式：DispatchServelet中HandleAdapter处理Handler
+
+（6）委派模式
+
 ##### 15. Spring事务实现原理
 
 ##### 16 *Spring事务失效原因场景
