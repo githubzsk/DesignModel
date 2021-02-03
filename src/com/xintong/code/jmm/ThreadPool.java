@@ -1,6 +1,6 @@
 package com.xintong.code.jmm;
 
-import com.xintong.code.proxy.proxy3.Run;
+import com.xintong.code.dm.proxy.proxy3.Run;
 
 import java.util.concurrent.*;
 import java.util.concurrent.locks.AbstractQueuedSynchronizer;

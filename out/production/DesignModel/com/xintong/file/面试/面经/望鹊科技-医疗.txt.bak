@@ -1,0 +1,22 @@
+基础
+集合 ArrayList HashMap
+
+并发
+AQS原理 
+
+数据库
+索引数据结构
+
+Redis
+缓存击穿 穿透 雪崩
+
+Spring 
+
+Srping MVC
+常用注解 RestController
+
+Spring Boot
+自动装配原理
+
+Spring Cloud
+Hystrix使用
