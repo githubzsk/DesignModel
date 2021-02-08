@@ -367,15 +367,120 @@ ENV			# 构建的时候设置环境变量
 ###### 实战测试
 
 ```shell
-# 创建一个自己的centos  
-FROM centos #从官方精简版的centos开始
+ 																#创建一个自己的centos  
+FROM centos 													#从官方精简版的centos开始
 MAINTAINER zsk<172585456@qq.com>
-ENV MYPATH /usr/local
-WORK
+ENV MYPATH /usr/local/dockerwkdir 								#配置环境变量  k v键值对的形式
+WORKDIR $MYPATH  												#将刚配的MYPATH这个地址用于docker的工作空间
+RUN yum -y install vim
+RUN yum -y install net-tools
+EXPOSE 80 														#暴露端口，Dockerfile里面暴露，就不用在启动时暴露
+CMD echo $MYPATH
+CMD echo "-----end-----"
+CMD /bin/bash
+
+# -f 指定dockerfile路径以及文件名   -t 要打包成的镜像名   后面在加一个点 .
+docker build -f mydockerfile -t mycentos:1.0 .
+```
+
+###### CMD/ENTRYPOINT区别
+
+- CMD ：覆盖，不能追加
+
+```shell
+vim cmd-docker-file
+# 编写dockerfile
+FROM centos
+CMD ["ls","-a"]
+:wq!
+# 构建镜像
+docker build -f ./cmd-docker-file -t cmdtest .
+# 运行容器
+[root@iz2ze5lz4uc5ewd9kdkgtbz dfdir]# docker run -it cmdtest
+.   .dockerenv	dev  home  lib64       media  opt   root  sbin	sys  usr
+..  bin		etc  lib   lost+found  mnt    proc  run   srv	tmp  var
+# 追加 -l在运行，报错 因为 -l替换了 ls -a
+[root@iz2ze5lz4uc5ewd9kdkgtbz dfdir]# docker run -it  cmdtest -l
+/usr/bin/docker-current: Error response from daemon: oci runtime error: container_linux.go:235: starting container process caused "exec: \"-l\": executable file not found in $PATH".
 
 ```
 
+- ENTRYPOINT：可以追加执行命令
 
+```shell
+vim entrypoint-docker-file
+# 编写dockerfile
+FROM centos
+ENTRYPOINT ["ls","-a"]
+:wq!
+# 构建镜像
+docker build -f ./entrypoint-docker-file -t enrtypointtest .
+# 运行容器
+[root@iz2ze5lz4uc5ewd9kdkgtbz dfdir]# docker run -it enrtypointtest
+.   .dockerenv	dev  home  lib64       media  opt   root  sbin	sys  usr
+..  bin		etc  lib   lost+found  mnt    proc  run   srv	tmp  var
+# 追加 -l正常运行 全部命令为 ls -a -l
+[root@iz2ze5lz4uc5ewd9kdkgtbz dfdir]# docker run -it enrtypointtest -l
+total 56
+drwxr-xr-x  1 root root 4096 Feb  8 03:17 .
+drwxr-xr-x  1 root root 4096 Feb  8 03:17 ..
+-rwxr-xr-x  1 root root    0 Feb  8 03:17 .dockerenv
+lrwxrwxrwx  1 root root    7 Nov  3 15:22 bin -> usr/bin
+drwxr-xr-x  5 root root  360 Feb  8 03:17 dev
+drwxr-xr-x  1 root root 4096 Feb  8 03:17 etc
+drwxr-xr-x  2 root root 4096 Nov  3 15:22 home
+lrwxrwxrwx  1 root root    7 Nov  3 15:22 lib -> usr/lib
+lrwxrwxrwx  1 root root    9 Nov  3 15:22 lib64 -> usr/lib64
+drwx------  2 root root 4096 Dec  4 17:37 lost+found
+drwxr-xr-x  2 root root 4096 Nov  3 15:22 media
+drwxr-xr-x  2 root root 4096 Nov  3 15:22 mnt
+drwxr-xr-x  2 root root 4096 Nov  3 15:22 opt
+dr-xr-xr-x 96 root root    0 Feb  8 03:17 proc
+dr-xr-x---  2 root root 4096 Dec  4 17:37 root
+drwxr-xr-x  1 root root 4096 Feb  8 03:17 run
+lrwxrwxrwx  1 root root    8 Nov  3 15:22 sbin -> usr/sbin
+drwxr-xr-x  2 root root 4096 Nov  3 15:22 srv
+dr-xr-xr-x 13 root root    0 Feb  8 03:17 sys
+drwxrwxrwt  7 root root 4096 Dec  4 17:37 tmp
+drwxr-xr-x 12 root root 4096 Dec  4 17:37 usr
+drwxr-xr-x 20 root root 4096 Dec  4 17:37 var
+
+```
+
+###### 构建Tomcat镜像
+
+- 准备镜像文件 tomcat压缩包，jdk压缩包
+
+  ![image-20210208112903103](../image/tomcat.png)
+
+- 编写Dockerfile文件，名称成Dockerfile 就不用在构建的时候使用 -f 指定文件
+
+  ```shell
+  FROM centos
+  MAINTAINER zsk<172585456@qq.com>
+  # 复制当前目录下的readme.txt 复制到容器内部的/usr/local/readme.txt
+  COPY readme.txt /usr/local/readme.txt
+  # ADD命令添加压缩包自动解压
+  ADD jdk-11.0.9_linux-x64_bin.tar.gz /usr/local/
+  ADD apache-tomcat-9.0.43.tar.gz /usr/local/
+  # 安装vim
+  RUN yum -y install vim
+  # 配置工作空间
+  ENV MYPATH /usr/local
+  WORKDIR $MYPATH
+  # 配置JDK环境变量
+  EVN JAVA_HOME /usr/local/java/file/tomcat/jdk-11.0.9
+  EVN CLASSPATH $JAVA_HOME/bin
+  # 配置Tomcat环境变量
+  ENV CATALINA_HOME /usr/local/java/file/tomcat/apache-tomcat-9.0.43
+  ENV CATALINA_BASE /usr/local/java/file/tomcat/apache-tomcat-9.0.43
+  ENV PATH $PATH:$JAVA_HOME/bin:$CATALINA_HOME/lib:$CATALINA_HOME/bin
+  # 暴露端口
+  EXPOSE 8080
+  CMD /usr/local/java/file/tomcat/apache-tomcat-9.0.43/bin/startup.sh && tail -F /usr/local/java/file/tomcat/apache-tomcat-9.0.43/bin/logs/catalina.out
+  ```
+
+  
 
 ##### 十、Docker网络
 
@@ -383,7 +488,7 @@ WORK
 
 ###### 	1.RabbitMQ
 
-```
+```shell
 	//拉取镜像
 	docker pull rabbitmq:management
 	
@@ -401,3 +506,92 @@ WORK
 ```
 
 ######  2.MySQL
+
+##### Shell基础知识
+
+###### 变量
+
+1. Linux Shell中的变量分为系统变量和用户自定义变量
+2. 系统变量 $HOME   $PWD   $SHELL   $USER
+
+###### 变量的定义
+
+- 基本语法
+
+  1. 定义变量： key=value
+  2. 撤销变量：unset key
+  3. 声明静态变量：readonly变量，注意：不能unset
+
+- 快速入门
+
+  1. 案例1：定义变量A
+
+     ```shell
+     A=100
+     echo A=$A
+     
+     [root@iz2ze5lz4uc5ewd9kdkgtbz tmp]# ./myShell.sh
+     A=100
+     ```
+
+  2. 案例2：撤销变量A
+
+     ```shell
+     A=100
+     echo A=$A
+     unset A
+     echo A=$A
+     
+     [root@iz2ze5lz4uc5ewd9kdkgtbz tmp]# ./myShell.sh
+     A=100
+     A=
+     ```
+
+###### 设置环境变量profile
+
+- 基本语法
+  1. export 变量名=变量值 (将shell变量输出为环境变量)
+  2. source 配置文件（让修改后的配置信息立即生效）
+  3. echo $变量名（查询环境变量的值
+
+- 快速入门
+
+  1. 在/etc/profile文件中定义TOMCAT_HOME环境变量
+
+     ```shell
+     TOMCAT_HOME=/usr/local/path/tomcat/apache-tomcat-9.0.43
+     export TOMCAT_HOME
+     ```
+
+  2. 查看环境变量中TOMCAT_HOME的值
+
+     ```shell
+     [root@iz2ze5lz4uc5ewd9kdkgtbz apache-tomcat-9.0.43]# echo $TOMCAT_HOME
+     /usr/local/path/tomcat/apache-tomcat-9.0.43
+     ```
+
+  3. 在另一个shell程序中使用TOMCAT_HOME
+
+     ```shell
+     A=$TOMCAT_HOME
+     echo A=$A
+     
+     [root@iz2ze5lz4uc5ewd9kdkgtbz tomcat]# ./myShell.sh 
+     A=/usr/local/path/tomcat/apache-tomcat-9.0.43
+     
+     ```
+
+     
+
+##### JDK环境变量
+
+```shell
+# JDK8
+JAVA_HOME=/usr/local/jdk1.8.0_161
+CLASSPATH=.:$JAVA_HOME/lib/tools.jar:$JAVA_HOME/jre/lib/rt.jar
+PATH=$JAVA_HOME/bin
+# JDK11
+JAVA_HOME=/usr/local/jdk11.0.0_161
+PATH=$JAVA_HOME/bin
+```
+
